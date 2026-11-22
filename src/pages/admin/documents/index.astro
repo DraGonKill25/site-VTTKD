@@ -1,0 +1,144 @@
+---
+import { getCollection } from "astro:content";
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+
+const results = await getCollection("results");
+---
+
+<AdminLayout
+  title="Documents sportifs"
+  description="Validation locale des documents publics associés aux résultats."
+>
+  <section class="site-container admin-section content-stack">
+    <div>
+      <p class="eyebrow">Préparation du stockage</p>
+      <h1>Documents sportifs</h1>
+      <p class="lead">
+        Vérification locale uniquement : aucun fichier n’est envoyé ou copié.
+      </p>
+    </div>
+    <div class="notice notice-warning">
+      Les justificatifs privés, documents contenant des données personnelles et
+      autorisations de mineurs sont interdits dans le site public et dans Git.
+    </div>
+    <form id="document-form" class="card form-grid" novalidate>
+      <div class="field">
+        <label for="document-id">Identifiant du document</label>
+        <input
+          id="document-id"
+          name="id"
+          pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
+          required
+        />
+      </div>
+      <div class="field">
+        <label for="document-result">Résultat associé</label>
+        <select id="document-result" name="resultId" required>
+          <option value="">Sélectionner</option>
+          {
+            results.map(({ data }) => (
+              <option value={data.id}>{data.id}</option>
+            ))
+          }
+        </select>
+      </div>
+      <div class="field field-full">
+        <label for="document-file">Fichier public</label>
+        <input
+          id="document-file"
+          name="file"
+          type="file"
+          accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+          required
+        />
+        <span class="field-help">PDF, JPEG ou PNG, 10 Mo maximum.</span>
+      </div>
+      <div class="field field-full">
+        <label class="checkbox-field">
+          <input name="publicOnly" type="checkbox" required />
+          Ce document est destiné à être public.
+        </label>
+      </div>
+      <div class="field field-full">
+        <label class="checkbox-field">
+          <input name="noPersonalData" type="checkbox" required />
+          J’ai vérifié l’absence de donnée personnelle, privée ou sensible.
+        </label>
+      </div>
+      <div class="field-full admin-form-actions">
+        <button class="button button-primary" type="submit">
+          Vérifier le fichier et les métadonnées
+        </button>
+      </div>
+    </form>
+    <div id="document-errors" class="notice notice-error" role="alert" hidden></div>
+    <div id="document-success" class="notice notice-success" hidden>
+      <strong>Validation locale réussie.</strong>
+      <p id="document-path"></p>
+      <p>
+        Aucun envoi n’a eu lieu. Suivre la procédure du mode de stockage retenu.
+      </p>
+    </div>
+  </section>
+
+  <script>
+    import {
+      publicDocumentPath,
+      validateDocumentCandidate,
+      type DocumentCandidate,
+    } from "../../../domain/documents";
+
+    const form = document.querySelector<HTMLFormElement>("#document-form");
+    const errors = document.querySelector<HTMLElement>("#document-errors");
+    const success = document.querySelector<HTMLElement>("#document-success");
+    const path = document.querySelector<HTMLElement>("#document-path");
+    const labels: Record<string, string> = {
+      id: "identifiant invalide",
+      resultId: "résultat manquant",
+      fileName: "nom de fichier invalide",
+      mimeType: "type non autorisé",
+      extension: "extension incompatible avec le type",
+      sizeBytes: "taille invalide ou supérieure à 10 Mo",
+      visibility: "document non public",
+      personalData: "présence de données personnelles",
+      duplicate: "doublon détecté",
+    };
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      errors?.setAttribute("hidden", "");
+      success?.setAttribute("hidden", "");
+      const data = new FormData(form);
+      const file = data.get("file");
+      if (!(file instanceof File) || file.size === 0) {
+        if (errors) {
+          errors.textContent = "Sélectionnez un fichier non vide.";
+          errors.hidden = false;
+        }
+        return;
+      }
+
+      const candidate: DocumentCandidate = {
+        id: String(data.get("id") ?? "").trim(),
+        resultId: String(data.get("resultId") ?? "").trim(),
+        fileName: file.name,
+        mimeType: file.type,
+        sizeBytes: file.size,
+        visibility: data.get("publicOnly") === "on" ? "public" : "private",
+        containsPersonalData: data.get("noPersonalData") !== "on",
+      };
+      const validation = validateDocumentCandidate(candidate);
+      if (validation.length) {
+        if (errors) {
+          errors.textContent = `Fichier refusé : ${validation.map((error) => labels[error] ?? error).join(", ")}.`;
+          errors.hidden = false;
+        }
+        return;
+      }
+      if (path) {
+        path.textContent = `Chemin préparé : ${publicDocumentPath(candidate)}`;
+      }
+      if (success) success.hidden = false;
+    });
+  </script>
+</AdminLayout>

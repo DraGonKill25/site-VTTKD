@@ -1,0 +1,25 @@
+{
+  "id": "demo-competition-winter",
+  "route": {
+    "fr": "competition-fictive-hiver",
+    "en": "fictional-winter-competition"
+  },
+  "name": {
+    "fr": "Compétition fictive d’hiver",
+    "en": "Fictional Winter Competition"
+  },
+  "startDate": "2026-12-05",
+  "location": {
+    "venue": { "fr": "Gymnase Démo", "en": "Demo Sports Hall" },
+    "city": { "fr": "Ville Démo", "en": "Demo City" },
+    "country": { "fr": "France", "en": "France" }
+  },
+  "level": { "fr": "Niveau à confirmer", "en": "Level to be confirmed" },
+  "disciplines": ["kyorugi", "poomsae"],
+  "status": "draft",
+  "summary": {
+    "fr": "Brouillon fictif, non publié sur les listes publiques.",
+    "en": "Fictional draft, not published in public listings."
+  },
+  "demo": true
+}

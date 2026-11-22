@@ -1,0 +1,659 @@
+---
+import { getCollection } from "astro:content";
+import {
+  createResultRecord,
+  type ResultDraft,
+  type ResultRecord,
+} from "../../../domain/results";
+import { localize } from "../../../lib/content";
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+
+const athletes = await getCollection("athletes");
+const competitions = await getCollection("competitions");
+const contentResults = await getCollection("results");
+const competitionById = new Map(
+  competitions.map(({ data }) => [data.id, data]),
+);
+const athleteById = new Map(
+  athletes.map(({ data }) => [data.id, localize(data.displayName, "fr")]),
+);
+
+const seedRecords: ResultRecord[] = contentResults.map(({ data }) => {
+  const competition = competitionById.get(data.competitionId);
+  const draft: ResultDraft = {
+    competitionId: data.competitionId,
+    competitionName: competition
+      ? localize(competition.name, "fr")
+      : "Compétition indisponible",
+    competitionDate: competition?.startDate ?? "",
+    competitionLocation: competition
+      ? `${localize(competition.location.venue, "fr")}, ${localize(competition.location.city, "fr")}`
+      : "Lieu indisponible",
+    discipline: data.discipline,
+    participantType: data.participantType,
+    participantName:
+      data.teamName && localize(data.teamName, "fr")
+        ? localize(data.teamName, "fr")
+        : data.athleteIds
+            .map((id) => athleteById.get(id) ?? "Profil indisponible")
+            .join(", "),
+    category:
+      data.details.discipline === "kyorugi"
+        ? `${localize(data.details.weightCategory, "fr")} · ${localize(data.details.ageCategory, "fr")}`
+        : `${localize(data.details.category, "fr")} · ${localize(data.details.poomsaeType, "fr")}`,
+    rank: data.rank,
+    medal: data.medal,
+    comment: localize(data.comment, "fr"),
+    sourceRef: data.sourceRef,
+    status: data.status,
+  };
+  return createResultRecord(
+    data.id,
+    draft,
+    data.createdBy,
+    data.createdAt,
+  );
+});
+
+const seedJson = JSON.stringify(seedRecords).replaceAll("<", "\\u003c");
+---
+
+<AdminLayout
+  title="Gestion des résultats"
+  description="Parcours local de création, confirmation et modification des résultats."
+>
+  <section class="site-container admin-section content-stack">
+    <div>
+      <p class="eyebrow">Administration sportive</p>
+      <h1>Gestion des résultats</h1>
+      <p class="lead">
+        Le récapitulatif est obligatoire avant chaque création ou modification.
+      </p>
+    </div>
+
+    <div id="admin-success" class="notice notice-success" hidden></div>
+
+    <section id="results-list-view" class="content-stack" data-admin-view>
+      <div class="admin-toolbar">
+        <div>
+          <h2>Résultats enregistrés</h2>
+          <p>Fixtures et changements locaux de démonstration.</p>
+        </div>
+        <div class="admin-toolbar-actions">
+          <button class="button button-secondary" type="button" id="reset-demo">
+            Réinitialiser la démo
+          </button>
+          <button class="button button-primary" type="button" id="new-result">
+            Créer un résultat
+          </button>
+        </div>
+      </div>
+      <div
+        class="table-scroll"
+        role="region"
+        aria-label="Tableau des résultats administratifs"
+        tabindex="0"
+      >
+        <table class="results-table admin-results-table">
+          <caption class="sr-only">Liste des résultats administratifs</caption>
+          <thead>
+            <tr>
+              <th scope="col">Compétition</th>
+              <th scope="col">Participant</th>
+              <th scope="col">Discipline</th>
+              <th scope="col">Classement</th>
+              <th scope="col">Statut</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-results-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="result-editor-view" data-admin-view hidden>
+      <div class="admin-toolbar">
+        <div>
+          <p class="eyebrow" id="editor-mode-label">Création</p>
+          <h2 id="editor-title">Créer un résultat</h2>
+        </div>
+      </div>
+      <div id="form-errors" class="notice notice-error" role="alert" hidden></div>
+      <form id="result-form" class="card form-grid" novalidate>
+        <input type="hidden" name="editingId" />
+        <div class="field field-full">
+          <label for="competition-id">Compétition de référence</label>
+          <select id="competition-id" name="competitionId" required>
+            <option value="">Sélectionner</option>
+            {
+              competitions.map(({ data }) => (
+                <option
+                  value={data.id}
+                  data-name={localize(data.name, "fr")}
+                  data-date={data.startDate}
+                  data-location={`${localize(data.location.venue, "fr")}, ${localize(data.location.city, "fr")}`}
+                >
+                  {localize(data.name, "fr")}
+                </option>
+              ))
+            }
+          </select>
+        </div>
+        <div class="field">
+          <label for="competition-name">Nom de la compétition</label>
+          <input id="competition-name" name="competitionName" required />
+        </div>
+        <div class="field">
+          <label for="competition-date">Date</label>
+          <input
+            id="competition-date"
+            name="competitionDate"
+            type="date"
+            required
+          />
+        </div>
+        <div class="field field-full">
+          <label for="competition-location">Lieu</label>
+          <input
+            id="competition-location"
+            name="competitionLocation"
+            required
+          />
+        </div>
+        <div class="field">
+          <label for="discipline">Discipline</label>
+          <select id="discipline" name="discipline" required>
+            <option value="kyorugi">Kyorugi</option>
+            <option value="poomsae">Poomsae</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="participant-type">Type de participation</label>
+          <select id="participant-type" name="participantType" required>
+            <option value="individual">Individuel</option>
+            <option value="pair">Paire</option>
+            <option value="team">Équipe</option>
+          </select>
+        </div>
+        <div class="field field-full">
+          <label for="participant-name">Athlète, paire ou équipe</label>
+          <input id="participant-name" name="participantName" required />
+          <span class="field-help">
+            Donnée locale de démonstration ; aucun profil réel n’est créé.
+          </span>
+        </div>
+        <div class="field field-full">
+          <label for="category">Catégorie</label>
+          <input id="category" name="category" required />
+        </div>
+        <div class="field">
+          <label for="rank">Classement</label>
+          <input id="rank" name="rank" type="number" min="1" step="1" />
+        </div>
+        <div class="field">
+          <label for="medal">Médaille</label>
+          <select id="medal" name="medal">
+            <option value="none">Aucune</option>
+            <option value="bronze">Bronze</option>
+            <option value="silver">Argent</option>
+            <option value="gold">Or</option>
+          </select>
+        </div>
+        <div class="field field-full">
+          <label for="comment">Commentaire facultatif</label>
+          <textarea id="comment" name="comment"></textarea>
+        </div>
+        <div class="field field-full">
+          <label for="source-ref">Source ou justificatif</label>
+          <input id="source-ref" name="sourceRef" />
+          <span class="field-help">
+            Saisir une référence, pas de donnée privée ni de fichier sensible.
+          </span>
+        </div>
+        <div class="field">
+          <label for="result-status">Statut</label>
+          <select id="result-status" name="status">
+            <option value="draft">Brouillon</option>
+            <option value="published">Publié</option>
+            <option value="archived">Archivé</option>
+            <option value="cancelled">Annulé</option>
+          </select>
+        </div>
+        <div class="field-full admin-form-actions">
+          <button class="button button-secondary" type="button" id="cancel-editor">
+            Annuler
+          </button>
+          <button class="button button-primary" type="submit">
+            Vérifier les informations
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section id="result-review-view" data-admin-view hidden>
+      <p class="eyebrow">Étape obligatoire</p>
+      <h2 id="review-title">Vérifier le résultat</h2>
+      <div class="notice notice-warning">
+        Rien n’est enregistré tant que « Confirmer et enregistrer » n’a pas été
+        sélectionné.
+      </div>
+      <dl id="result-recap" class="recap-grid"></dl>
+      <div id="change-recap" class="card" hidden>
+        <h3>Modifications détectées</h3>
+        <ul id="change-list"></ul>
+      </div>
+      <div class="admin-form-actions">
+        <button class="button button-secondary" type="button" id="cancel-review">
+          Annuler les modifications
+        </button>
+        <button class="button button-secondary" type="button" id="back-to-editor">
+          Modifier les informations
+        </button>
+        <button class="button button-primary" type="button" id="confirm-result">
+          Confirmer et enregistrer
+        </button>
+      </div>
+    </section>
+
+    <section id="result-detail-view" data-admin-view hidden>
+      <div class="admin-toolbar">
+        <div>
+          <p class="eyebrow">Fiche enregistrée</p>
+          <h2 id="detail-title"></h2>
+        </div>
+        <div class="admin-toolbar-actions">
+          <button class="button button-secondary" type="button" id="back-to-list">
+            Retour à la liste
+          </button>
+          <button class="button button-primary" type="button" id="edit-result">
+            Modifier
+          </button>
+        </div>
+      </div>
+      <dl id="result-detail" class="recap-grid"></dl>
+      <section class="card content-stack">
+        <h3>Historique des modifications</h3>
+        <p id="history-summary"></p>
+        <ol id="result-history" class="history-list"></ol>
+      </section>
+    </section>
+  </section>
+
+  <script
+    id="result-seed"
+    type="application/json"
+    set:html={seedJson}
+  />
+
+  <script>
+    import {
+      createResultRecord,
+      diffResult,
+      updateResultRecord,
+      upsertResult,
+      validateResultDraft,
+      type ResultDraft,
+      type ResultRecord,
+    } from "../../../domain/results";
+
+    const storageKey = "vttkd-result-admin-demo-v1";
+    const actor = "Compte local de démonstration";
+    const seedElement = document.querySelector<HTMLScriptElement>("#result-seed");
+    const seed = JSON.parse(seedElement?.textContent ?? "[]") as ResultRecord[];
+
+    function loadRecords(): ResultRecord[] {
+      try {
+        const saved = localStorage.getItem(storageKey);
+        return saved ? (JSON.parse(saved) as ResultRecord[]) : seed;
+      } catch {
+        return seed;
+      }
+    }
+
+    let records = loadRecords();
+    let pendingDraft: ResultDraft | undefined;
+    let editingId: string | undefined;
+    let detailId: string | undefined;
+
+    const views = Array.from(
+      document.querySelectorAll<HTMLElement>("[data-admin-view]"),
+    );
+    const listBody =
+      document.querySelector<HTMLTableSectionElement>("#admin-results-body");
+    const form = document.querySelector<HTMLFormElement>("#result-form");
+    const success = document.querySelector<HTMLElement>("#admin-success");
+    const errorBox = document.querySelector<HTMLElement>("#form-errors");
+
+    const labels: Record<keyof ResultDraft, string> = {
+      competitionId: "Identifiant de compétition",
+      competitionName: "Compétition",
+      competitionDate: "Date",
+      competitionLocation: "Lieu",
+      discipline: "Discipline",
+      participantType: "Type de participation",
+      participantName: "Athlète ou équipe",
+      category: "Catégorie",
+      rank: "Classement",
+      medal: "Médaille",
+      comment: "Commentaire",
+      sourceRef: "Source ou justificatif",
+      status: "Statut",
+    };
+
+    const displayValues = {
+      discipline: { kyorugi: "Kyorugi", poomsae: "Poomsae" },
+      participantType: {
+        individual: "Individuel",
+        pair: "Paire",
+        team: "Équipe",
+      },
+      medal: {
+        none: "Aucune",
+        bronze: "Bronze",
+        silver: "Argent",
+        gold: "Or",
+      },
+      status: {
+        draft: "Brouillon",
+        published: "Publié",
+        archived: "Archivé",
+        cancelled: "Annulé",
+      },
+    } as const;
+
+    function showView(id: string): void {
+      for (const view of views) view.hidden = view.id !== id;
+      success?.setAttribute("hidden", "");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function saveRecords(): void {
+      localStorage.setItem(storageKey, JSON.stringify(records));
+    }
+
+    function textCell(value: string): HTMLTableCellElement {
+      const cell = document.createElement("td");
+      cell.textContent = value;
+      return cell;
+    }
+
+    function renderList(): void {
+      if (!listBody) return;
+      listBody.replaceChildren();
+
+      for (const record of records) {
+        const row = document.createElement("tr");
+        row.append(
+          textCell(record.competitionName),
+          textCell(record.participantName),
+          textCell(displayValues.discipline[record.discipline]),
+          textCell(record.rank === null ? "—" : String(record.rank)),
+          textCell(displayValues.status[record.status]),
+        );
+        const actions = document.createElement("td");
+        const open = document.createElement("button");
+        open.type = "button";
+        open.className = "button button-secondary button-small";
+        open.dataset.openResult = record.id;
+        open.textContent = "Ouvrir";
+        actions.append(open);
+        row.append(actions);
+        listBody.append(row);
+      }
+    }
+
+    function draftFromForm(): ResultDraft {
+      const data = new FormData(form ?? undefined);
+      const rank = String(data.get("rank") ?? "").trim();
+
+      return {
+        competitionId: String(data.get("competitionId") ?? "").trim(),
+        competitionName: String(data.get("competitionName") ?? "").trim(),
+        competitionDate: String(data.get("competitionDate") ?? "").trim(),
+        competitionLocation: String(
+          data.get("competitionLocation") ?? "",
+        ).trim(),
+        discipline: String(data.get("discipline")) as ResultDraft["discipline"],
+        participantType: String(
+          data.get("participantType"),
+        ) as ResultDraft["participantType"],
+        participantName: String(data.get("participantName") ?? "").trim(),
+        category: String(data.get("category") ?? "").trim(),
+        rank: rank ? Number(rank) : null,
+        medal: String(data.get("medal")) as ResultDraft["medal"],
+        comment: String(data.get("comment") ?? "").trim(),
+        sourceRef: String(data.get("sourceRef") ?? "").trim(),
+        status: String(data.get("status")) as ResultDraft["status"],
+      };
+    }
+
+    function setFormValue(name: keyof ResultDraft, value: string | number | null): void {
+      const field = form?.elements.namedItem(name);
+      if (
+        field instanceof HTMLInputElement ||
+        field instanceof HTMLTextAreaElement ||
+        field instanceof HTMLSelectElement
+      ) {
+        field.value = value === null ? "" : String(value);
+      }
+    }
+
+    function openEditor(record?: ResultRecord): void {
+      form?.reset();
+      errorBox?.setAttribute("hidden", "");
+      editingId = record?.id;
+      pendingDraft = undefined;
+
+      const title = document.querySelector<HTMLElement>("#editor-title");
+      const mode = document.querySelector<HTMLElement>("#editor-mode-label");
+      if (title) title.textContent = record ? "Modifier le résultat" : "Créer un résultat";
+      if (mode) mode.textContent = record ? "Modification" : "Création";
+
+      if (record) {
+        for (const key of Object.keys(labels) as Array<keyof ResultDraft>) {
+          setFormValue(key, record[key]);
+        }
+      } else {
+        setFormValue("status", "draft");
+        setFormValue("medal", "none");
+      }
+      showView("result-editor-view");
+    }
+
+    function displayValue(
+      field: keyof ResultDraft,
+      value: ResultDraft[keyof ResultDraft],
+    ): string {
+      if (value === null || value === "") return "—";
+      if (field === "discipline") {
+        return displayValues.discipline[value as ResultDraft["discipline"]];
+      }
+      if (field === "participantType") {
+        return displayValues.participantType[
+          value as ResultDraft["participantType"]
+        ];
+      }
+      if (field === "medal") {
+        return displayValues.medal[value as ResultDraft["medal"]];
+      }
+      if (field === "status") {
+        return displayValues.status[value as ResultDraft["status"]];
+      }
+      return String(value);
+    }
+
+    function renderDefinitionList(
+      target: HTMLElement | null,
+      draft: ResultDraft,
+    ): void {
+      if (!target) return;
+      target.replaceChildren();
+      for (const field of Object.keys(labels) as Array<keyof ResultDraft>) {
+        if (field === "competitionId") continue;
+        const wrapper = document.createElement("div");
+        const term = document.createElement("dt");
+        const description = document.createElement("dd");
+        term.textContent = labels[field];
+        description.textContent = displayValue(field, draft[field]);
+        wrapper.append(term, description);
+        target.append(wrapper);
+      }
+    }
+
+    function renderReview(draft: ResultDraft): void {
+      renderDefinitionList(document.querySelector("#result-recap"), draft);
+      const reviewTitle = document.querySelector<HTMLElement>("#review-title");
+      if (reviewTitle) {
+        reviewTitle.textContent = editingId
+          ? "Vérifier les modifications"
+          : "Vérifier le nouveau résultat";
+      }
+
+      const changeBox = document.querySelector<HTMLElement>("#change-recap");
+      const changeList = document.querySelector<HTMLElement>("#change-list");
+      const previous = records.find(({ id }) => id === editingId);
+      const changes = previous ? diffResult(previous, draft) : [];
+      if (changeBox && changeList) {
+        changeList.replaceChildren();
+        changeBox.hidden = !previous;
+        for (const change of changes) {
+          const item = document.createElement("li");
+          item.textContent = `${labels[change.field]} : « ${change.previousValue || "—"} » → « ${change.nextValue || "—"} »`;
+          changeList.append(item);
+        }
+        if (previous && changes.length === 0) {
+          const item = document.createElement("li");
+          item.textContent = "Aucune différence détectée.";
+          changeList.append(item);
+        }
+      }
+    }
+
+    function openDetail(id: string): void {
+      const record = records.find((candidate) => candidate.id === id);
+      if (!record) return;
+      detailId = id;
+      const title = document.querySelector<HTMLElement>("#detail-title");
+      if (title) title.textContent = record.participantName;
+      renderDefinitionList(document.querySelector("#result-detail"), record);
+
+      const summary = document.querySelector<HTMLElement>("#history-summary");
+      if (summary) {
+        summary.textContent = `Créé le ${new Date(record.createdAt).toLocaleString("fr-FR")} par ${record.createdBy}. Dernière modification le ${new Date(record.updatedAt).toLocaleString("fr-FR")} par ${record.updatedBy}.`;
+      }
+      const history = document.querySelector<HTMLOListElement>("#result-history");
+      history?.replaceChildren();
+      for (const entry of [...record.history].reverse()) {
+        const item = document.createElement("li");
+        const heading = document.createElement("strong");
+        heading.textContent = `${new Date(entry.changedAt).toLocaleString("fr-FR")} · ${entry.changedBy}`;
+        const list = document.createElement("ul");
+        for (const change of entry.changes) {
+          const changeItem = document.createElement("li");
+          changeItem.textContent = `${labels[change.field]} : « ${change.previousValue || "—"} » → « ${change.nextValue || "—"} »`;
+          list.append(changeItem);
+        }
+        item.append(heading, list);
+        history?.append(item);
+      }
+      showView("result-detail-view");
+    }
+
+    document.querySelector("#new-result")?.addEventListener("click", () => {
+      openEditor();
+    });
+
+    document.querySelector("#cancel-editor")?.addEventListener("click", () => {
+      showView("results-list-view");
+    });
+
+    document.querySelector("#competition-id")?.addEventListener("change", (event) => {
+      const select = event.currentTarget as HTMLSelectElement;
+      const option = select.selectedOptions[0];
+      if (!option) return;
+      setFormValue("competitionName", option.dataset.name ?? "");
+      setFormValue("competitionDate", option.dataset.date ?? "");
+      setFormValue("competitionLocation", option.dataset.location ?? "");
+    });
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const draft = draftFromForm();
+      const errors = validateResultDraft(draft);
+      if (errors.length) {
+        if (errorBox) {
+          errorBox.textContent = `Corrigez les champs suivants : ${errors.map((field) => labels[field as keyof ResultDraft]).join(", ")}.`;
+          errorBox.hidden = false;
+        }
+        return;
+      }
+      pendingDraft = draft;
+      renderReview(draft);
+      showView("result-review-view");
+    });
+
+    document.querySelector("#back-to-editor")?.addEventListener("click", () => {
+      showView("result-editor-view");
+    });
+
+    document.querySelector("#cancel-review")?.addEventListener("click", () => {
+      pendingDraft = undefined;
+      showView(editingId ? "result-detail-view" : "results-list-view");
+    });
+
+    document.querySelector("#confirm-result")?.addEventListener("click", () => {
+      if (!pendingDraft) return;
+      const now = new Date().toISOString();
+      const existing = records.find(({ id }) => id === editingId);
+      const saved = existing
+        ? updateResultRecord(existing, pendingDraft, actor, now)
+        : createResultRecord(
+            `demo-local-${crypto.randomUUID()}`,
+            pendingDraft,
+            actor,
+            now,
+          );
+      records = upsertResult(records, saved);
+      saveRecords();
+      renderList();
+      pendingDraft = undefined;
+      editingId = undefined;
+      if (success) {
+        success.textContent = existing
+          ? "Le résultat a été mis à jour sans créer de doublon."
+          : "Le résultat a été enregistré après confirmation.";
+        success.hidden = false;
+      }
+      showView("results-list-view");
+      if (success) success.hidden = false;
+    });
+
+    listBody?.addEventListener("click", (event) => {
+      const button = (event.target as HTMLElement).closest<HTMLButtonElement>(
+        "[data-open-result]",
+      );
+      if (button?.dataset.openResult) openDetail(button.dataset.openResult);
+    });
+
+    document.querySelector("#back-to-list")?.addEventListener("click", () => {
+      showView("results-list-view");
+    });
+
+    document.querySelector("#edit-result")?.addEventListener("click", () => {
+      const record = records.find(({ id }) => id === detailId);
+      if (record) openEditor(record);
+    });
+
+    document.querySelector("#reset-demo")?.addEventListener("click", () => {
+      records = structuredClone(seed);
+      localStorage.removeItem(storageKey);
+      renderList();
+      if (success) {
+        success.textContent = "Les données locales ont été réinitialisées.";
+        success.hidden = false;
+      }
+    });
+
+    renderList();
+  </script>
+</AdminLayout>

@@ -1,0 +1,36 @@
+{
+  "id": "demo-result-002",
+  "competitionId": "demo-competition-horizon",
+  "discipline": "kyorugi",
+  "participantType": "individual",
+  "athleteIds": ["demo-athlete-c"],
+  "rank": 5,
+  "medal": "none",
+  "status": "published",
+  "comment": {
+    "fr": "Classement publié sans médaille, entièrement fictif.",
+    "en": "Published ranking without a medal, entirely fictional."
+  },
+  "sourceRef": "Référence fictive — aucun document réel",
+  "documents": [],
+  "details": {
+    "discipline": "kyorugi",
+    "weightCategory": {
+      "fr": "Catégorie de poids fictive B",
+      "en": "Fictional weight category B"
+    },
+    "ageCategory": {
+      "fr": "Catégorie d’âge fictive",
+      "en": "Fictional age category"
+    }
+  },
+  "createdAt": "2026-10-12T17:00:00Z",
+  "createdBy": "Compte Démo Sport",
+  "updatedAt": "2026-10-12T17:00:00Z",
+  "updatedBy": "Compte Démo Sport",
+  "changeSummary": {
+    "fr": "Création fictive.",
+    "en": "Fictional creation."
+  },
+  "demo": true
+}

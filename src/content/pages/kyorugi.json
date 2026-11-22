@@ -1,0 +1,21 @@
+{
+  "id": "kyorugi",
+  "route": {
+    "fr": "disciplines/combat",
+    "en": "disciplines/combat"
+  },
+  "title": {
+    "fr": "Kyorugi — combat",
+    "en": "Kyorugi — sparring"
+  },
+  "lead": {
+    "fr": "La discipline principale mise en avant par le site.",
+    "en": "The primary discipline featured on the website."
+  },
+  "body": {
+    "fr": "Cette présentation générale du Kyorugi ne contient aucun résultat ou fait sportif attribué au club.",
+    "en": "This general Kyorugi presentation contains no results or sporting claims attributed to the club."
+  },
+  "status": "published",
+  "demo": true
+}

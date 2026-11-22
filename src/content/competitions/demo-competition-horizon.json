@@ -1,0 +1,25 @@
+{
+  "id": "demo-competition-horizon",
+  "route": {
+    "fr": "tournoi-demonstration-horizon",
+    "en": "horizon-demonstration-tournament"
+  },
+  "name": {
+    "fr": "Tournoi Démonstration Horizon",
+    "en": "Horizon Demonstration Tournament"
+  },
+  "startDate": "2026-10-12",
+  "location": {
+    "venue": { "fr": "Gymnase Exemple", "en": "Example Sports Hall" },
+    "city": { "fr": "Ville Démo", "en": "Demo City" },
+    "country": { "fr": "France", "en": "France" }
+  },
+  "level": { "fr": "Niveau fictif", "en": "Fictional level" },
+  "disciplines": ["kyorugi"],
+  "status": "published",
+  "summary": {
+    "fr": "Compétition fictive utilisée pour valider la présentation.",
+    "en": "Fictional competition used to validate the presentation."
+  },
+  "demo": true
+}

@@ -1,0 +1,16 @@
+{
+  "id": "demo-athlete-a",
+  "displayName": { "fr": "Athlète Démo A", "en": "Demo Athlete A" },
+  "disciplines": ["kyorugi"],
+  "sportCategory": {
+    "fr": "Catégorie Kyorugi fictive",
+    "en": "Fictional Kyorugi category"
+  },
+  "profileVisibility": "public",
+  "status": "published",
+  "biography": {
+    "fr": "Biographie de démonstration. Aucun parcours réel n’est présenté.",
+    "en": "Demonstration biography. No real sporting record is presented."
+  },
+  "demo": true
+}

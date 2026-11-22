@@ -1,0 +1,44 @@
+---
+import type { Language } from "../../config/site";
+import Breadcrumbs from "../layout/Breadcrumbs.astro";
+
+interface Breadcrumb {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  lang: Language;
+  title: string;
+  lead: string;
+  eyebrow?: string;
+  breadcrumbs?: Breadcrumb[];
+  compact?: boolean;
+}
+
+const {
+  lang,
+  title,
+  lead,
+  eyebrow,
+  breadcrumbs = [],
+  compact = false,
+} = Astro.props;
+---
+
+<section class:list={["page-hero", { "page-hero-compact": compact }]}>
+  <div class="site-container">
+    {
+      breadcrumbs.length > 0 && (
+        <Breadcrumbs
+          items={breadcrumbs}
+          label={lang === "fr" ? "Fil d’Ariane" : "Breadcrumb"}
+        />
+      )
+    }
+    {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+    <h1>{title}</h1>
+    <p class="lead">{lead}</p>
+    <slot />
+  </div>
+</section>

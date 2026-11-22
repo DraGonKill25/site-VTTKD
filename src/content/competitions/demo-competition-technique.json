@@ -1,0 +1,28 @@
+{
+  "id": "demo-competition-technique",
+  "route": {
+    "fr": "coupe-technique-demo",
+    "en": "demo-technical-cup"
+  },
+  "name": {
+    "fr": "Coupe Technique Démo",
+    "en": "Demo Technical Cup"
+  },
+  "startDate": "2026-09-28",
+  "location": {
+    "venue": {
+      "fr": "Centre Sportif Démo",
+      "en": "Demo Sports Centre"
+    },
+    "city": { "fr": "Ville Exemple", "en": "Example City" },
+    "country": { "fr": "France", "en": "France" }
+  },
+  "level": { "fr": "Niveau fictif", "en": "Fictional level" },
+  "disciplines": ["poomsae"],
+  "status": "published",
+  "summary": {
+    "fr": "Compétition Poomsae fictive pour tester un résultat d’équipe.",
+    "en": "Fictional Poomsae competition used to test a team result."
+  },
+  "demo": true
+}

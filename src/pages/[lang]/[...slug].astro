@@ -1,0 +1,84 @@
+---
+import { getCollection } from "astro:content";
+import PublicPage, {
+  type PublicPageKey,
+} from "../../components/pages/PublicPage.astro";
+import {
+  SUPPORTED_LANGUAGES,
+  type Language,
+} from "../../config/site";
+import {
+  route,
+  stripBasePath,
+  type RouteKey,
+} from "../../i18n/routes";
+
+interface Props {
+  lang: Language;
+  page: PublicPageKey;
+  entryId?: string;
+}
+
+export async function getStaticPaths() {
+  const staticPages: RouteKey[] = [
+    "club",
+    "coaching",
+    "disciplines",
+    "kyorugi",
+    "poomsae",
+    "athletes",
+    "competitions",
+    "results",
+    "honours",
+    "schedules",
+    "calendar",
+    "news",
+    "media",
+    "contact",
+    "legal",
+    "privacy",
+  ];
+  const athletes = (await getCollection("athletes")).filter(
+    ({ data }) =>
+      data.status === "published" && data.profileVisibility === "public",
+  );
+  const competitions = (await getCollection("competitions")).filter(
+    ({ data }) => data.status === "published",
+  );
+
+  return SUPPORTED_LANGUAGES.flatMap((lang) => [
+    ...staticPages.map((page) => ({
+      params: {
+        lang,
+        slug: stripBasePath(route(lang, page))
+          .replace(`/${lang}/`, "")
+          .replace(/^\/|\/$/g, ""),
+      },
+      props: { lang, page },
+    })),
+    ...athletes.map(({ data }) => ({
+      params: { lang, slug: `athletes/${data.id}` },
+      props: {
+        lang,
+        page: "athleteProfile" as const,
+        entryId: data.id,
+      },
+    })),
+    ...competitions.map(({ data }) => ({
+      params: {
+        lang,
+        slug: `competitions/${data.route[lang]}`,
+      },
+      props: {
+        lang,
+        page: "competitionDetail" as const,
+        entryId: data.id,
+      },
+    })),
+  ]);
+}
+
+const { lang, page, entryId } = Astro.props;
+---
+
+<PublicPage lang={lang} page={page} entryId={entryId} />

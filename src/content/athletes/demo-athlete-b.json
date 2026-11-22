@@ -1,0 +1,16 @@
+{
+  "id": "demo-athlete-b",
+  "displayName": { "fr": "Athlète Démo B", "en": "Demo Athlete B" },
+  "disciplines": ["poomsae"],
+  "sportCategory": {
+    "fr": "Équipe Poomsae fictive",
+    "en": "Fictional Poomsae team"
+  },
+  "profileVisibility": "public",
+  "status": "published",
+  "biography": {
+    "fr": "Profil fictif destiné à tester les résultats d’équipe.",
+    "en": "Fictional profile used to test team results."
+  },
+  "demo": true
+}

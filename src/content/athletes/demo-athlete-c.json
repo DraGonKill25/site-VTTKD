@@ -1,0 +1,16 @@
+{
+  "id": "demo-athlete-c",
+  "displayName": { "fr": "Athlète Démo C", "en": "Demo Athlete C" },
+  "disciplines": ["kyorugi"],
+  "sportCategory": {
+    "fr": "Catégorie Kyorugi fictive",
+    "en": "Fictional Kyorugi category"
+  },
+  "profileVisibility": "public",
+  "status": "published",
+  "biography": {
+    "fr": "Profil fictif destiné à valider un classement sans médaille.",
+    "en": "Fictional profile used to validate a ranking without a medal."
+  },
+  "demo": true
+}

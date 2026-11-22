@@ -1,0 +1,29 @@
+{
+  "id": "demo-archived-course",
+  "name": {
+    "fr": "Exemple archivé — entraînement",
+    "en": "Archived example — training"
+  },
+  "discipline": "kyorugi",
+  "dayOfWeek": "wednesday",
+  "startTime": "18:00",
+  "endTime": "19:30",
+  "location": {
+    "fr": "Salle fictive — exemple uniquement",
+    "en": "Fictional venue — example only"
+  },
+  "group": {
+    "fr": "Groupe fictif",
+    "en": "Fictional group"
+  },
+  "description": {
+    "fr": "Donnée de démonstration archivée, jamais affichée comme un horaire réel.",
+    "en": "Archived demonstration data, never displayed as a real schedule."
+  },
+  "validFrom": "2025-01-01",
+  "validUntil": "2025-06-30",
+  "status": "archived",
+  "displayOrder": 10,
+  "timeZone": "Europe/Paris",
+  "demo": true
+}

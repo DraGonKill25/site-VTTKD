@@ -1,0 +1,42 @@
+{
+  "generatedAt": "2026-11-22T21:57:22.601Z",
+  "environment": "local-preview",
+  "summary": [
+    {
+      "page": "/fr/",
+      "scores": {
+        "performance": 0.95,
+        "accessibility": 1,
+        "best-practices": 1,
+        "seo": 0.66
+      }
+    },
+    {
+      "page": "/en/",
+      "scores": {
+        "performance": 1,
+        "accessibility": 1,
+        "best-practices": 1,
+        "seo": 0.66
+      }
+    },
+    {
+      "page": "/fr/resultats/",
+      "scores": {
+        "performance": 1,
+        "accessibility": 1,
+        "best-practices": 1,
+        "seo": 0.66
+      }
+    },
+    {
+      "page": "/fr/contact/",
+      "scores": {
+        "performance": 1,
+        "accessibility": 1,
+        "best-practices": 1,
+        "seo": 0.66
+      }
+    }
+  ]
+}

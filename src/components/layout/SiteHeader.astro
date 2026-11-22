@@ -1,0 +1,139 @@
+---
+import logo from "../../../logo.jpg";
+import type { Language } from "../../config/site";
+import { getUi } from "../../i18n/ui";
+import { route, switchLanguagePath, type RouteKey } from "../../i18n/routes";
+
+interface Props {
+  lang: Language;
+  pathname: string;
+  alternatePath?: string;
+}
+
+const { lang, pathname, alternatePath } = Astro.props;
+const t = getUi(lang);
+const otherLanguage: Language = lang === "fr" ? "en" : "fr";
+
+const navigation: Array<{ key: RouteKey; label: string }> = [
+  { key: "home", label: t.home },
+  { key: "club", label: t.club },
+  { key: "disciplines", label: t.disciplines },
+  { key: "athletes", label: t.athletes },
+  { key: "competitions", label: t.competitions },
+  { key: "results", label: t.results },
+  { key: "honours", label: t.honours },
+  { key: "schedules", label: t.schedules },
+  { key: "calendar", label: t.calendar },
+  { key: "news", label: t.news },
+  { key: "media", label: t.media },
+  { key: "contact", label: t.contact },
+];
+---
+
+<header class="site-header" data-site-header>
+  <div class="site-container header-inner">
+    <a class="brand-link" href={route(lang, "home")}>
+      <img
+        src={logo.src}
+        width="48"
+        height="48"
+        alt=""
+        decoding="async"
+      />
+      <span>
+        <strong>VAN THUYNE<br />TAEKWONDO</strong>
+        <small>CLUB ELITE · PROPOSITION</small>
+      </span>
+    </a>
+
+    <div class="mobile-actions">
+      <button
+        class="button button-primary menu-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="site-navigation"
+        data-menu-toggle
+      >
+        <span data-menu-label>{t.menu}</span>
+      </button>
+      <a
+        class="button button-ghost language-link"
+        href={alternatePath ?? switchLanguagePath(pathname, lang)}
+        lang={otherLanguage}
+        hreflang={otherLanguage}
+      >
+        {otherLanguage.toUpperCase()}
+      </a>
+    </div>
+
+    <nav
+      id="site-navigation"
+      class="site-navigation"
+      aria-label={lang === "fr" ? "Navigation principale" : "Main navigation"}
+    >
+      {
+        navigation.map((item) => {
+          const href = route(lang, item.key);
+          const current =
+            pathname === href ||
+            (item.key !== "home" && pathname.startsWith(href));
+          return (
+            <a href={href} aria-current={current ? "page" : undefined}>
+              {item.label}
+            </a>
+          );
+        })
+      }
+    </nav>
+
+    <div class="desktop-actions">
+      <a
+        class="language-link"
+        href={alternatePath ?? switchLanguagePath(pathname, lang)}
+        lang={otherLanguage}
+        hreflang={otherLanguage}
+      >
+        {otherLanguage.toUpperCase()}
+      </a>
+      <a class="button button-primary" href={route(lang, "results")}>
+        {t.viewResults}
+      </a>
+    </div>
+  </div>
+</header>
+
+<script>
+  const headers = document.querySelectorAll<HTMLElement>("[data-site-header]");
+
+  for (const header of headers) {
+    const button = header.querySelector<HTMLButtonElement>("[data-menu-toggle]");
+    const navigation = header.querySelector<HTMLElement>(".site-navigation");
+    const label = button?.querySelector<HTMLElement>("[data-menu-label]");
+
+    const close = () => {
+      header.classList.remove("is-menu-open");
+      button?.setAttribute("aria-expanded", "false");
+      if (label) label.textContent = "Menu";
+    };
+
+    button?.addEventListener("click", () => {
+      const open = !header.classList.contains("is-menu-open");
+      header.classList.toggle("is-menu-open", open);
+      button.setAttribute("aria-expanded", String(open));
+      if (label) {
+        label.textContent = open
+          ? document.documentElement.lang === "fr"
+            ? "Fermer"
+            : "Close"
+          : "Menu";
+      }
+      if (open) navigation?.querySelector<HTMLAnchorElement>("a")?.focus();
+    });
+
+    header.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      close();
+      button?.focus();
+    });
+  }
+</script>

@@ -1,0 +1,667 @@
+settings:
+  content:
+    merge: true
+  commit:
+    identity: user
+
+components:
+  localized:
+    type: object
+    fields:
+      - name: fr
+        label: Français
+        type: string
+        required: true
+      - name: en
+        label: English
+        type: string
+        required: true
+
+content:
+  - name: sport
+    label: Sport
+    type: group
+    items:
+      - name: athletes
+        label: Athlètes
+        type: collection
+        path: src/content/athletes
+        format: json
+        filename: "{id}.json"
+        view:
+          primary: displayName.fr
+        operations:
+          rename: false
+          delete: false
+        fields:
+          - name: id
+            label: Identifiant stable
+            type: string
+            required: true
+            pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          - name: displayName
+            label: Nom affiché
+            component: localized
+          - name: disciplines
+            label: Disciplines
+            type: select
+            list: true
+            options:
+              - value: kyorugi
+                label: Kyorugi
+              - value: poomsae
+                label: Poomsae
+          - name: sportCategory
+            label: Catégorie sportive
+            component: localized
+          - name: profileVisibility
+            label: Visibilité
+            type: select
+            options:
+              - value: public
+                label: Public
+              - value: hidden
+                label: Masqué
+          - name: status
+            label: Statut
+            type: select
+            options:
+              - value: draft
+                label: Brouillon
+              - value: published
+                label: Publié
+              - value: archived
+                label: Archivé
+              - value: cancelled
+                label: Annulé
+          - name: biography
+            label: Biographie
+            component: localized
+          - name: photo
+            label: Photo autorisée
+            type: image
+          - name: demo
+            label: Démonstration
+            type: boolean
+
+      - name: competitions
+        label: Compétitions
+        type: collection
+        path: src/content/competitions
+        format: json
+        filename: "{id}.json"
+        view:
+          primary: name.fr
+        operations:
+          rename: false
+          delete: false
+        fields:
+          - name: id
+            label: Identifiant stable
+            type: string
+            required: true
+            pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          - name: route
+            label: Routes
+            component: localized
+          - name: name
+            label: Nom
+            component: localized
+          - name: startDate
+            label: Date de début
+            type: date
+            required: true
+            options:
+              time: false
+          - name: endDate
+            label: Date de fin
+            type: date
+            options:
+              time: false
+          - name: location
+            label: Lieu
+            type: object
+            fields:
+              - name: venue
+                label: Salle
+                component: localized
+              - name: city
+                label: Ville
+                component: localized
+              - name: country
+                label: Pays
+                component: localized
+          - name: level
+            label: Niveau
+            component: localized
+          - name: disciplines
+            label: Disciplines
+            type: select
+            list: true
+            options:
+              - value: kyorugi
+                label: Kyorugi
+              - value: poomsae
+                label: Poomsae
+          - name: status
+            label: Statut
+            type: select
+            options:
+              - value: draft
+                label: Brouillon
+              - value: published
+                label: Publié
+              - value: archived
+                label: Archivé
+              - value: cancelled
+                label: Annulé
+          - name: summary
+            label: Résumé
+            component: localized
+          - name: demo
+            label: Démonstration
+            type: boolean
+
+      - name: results
+        label: Résultats
+        type: collection
+        path: src/content/results
+        format: json
+        filename: "{id}.json"
+        view:
+          primary: id
+        operations:
+          rename: false
+          delete: false
+        fields:
+          - name: id
+            label: Identifiant stable
+            type: string
+            required: true
+            pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          - name: competitionId
+            label: Compétition
+            type: string
+            required: true
+          - name: discipline
+            label: Discipline
+            type: select
+            options:
+              - value: kyorugi
+                label: Kyorugi
+              - value: poomsae
+                label: Poomsae
+          - name: participantType
+            label: Type de participation
+            type: select
+            options:
+              - value: individual
+                label: Individuel
+              - value: pair
+                label: Paire
+              - value: team
+                label: Équipe
+          - name: athleteIds
+            label: Identifiants des athlètes
+            type: string
+            list: true
+            required: true
+          - name: teamName
+            label: Nom de l'équipe
+            component: localized
+          - name: rank
+            label: Classement
+            type: number
+            options:
+              min: 1
+              step: 1
+          - name: medal
+            label: Médaille
+            type: select
+            options:
+              - value: none
+                label: Aucune
+              - value: bronze
+                label: Bronze
+              - value: silver
+                label: Argent
+              - value: gold
+                label: Or
+          - name: status
+            label: Statut
+            type: select
+            options:
+              - value: draft
+                label: Brouillon
+              - value: published
+                label: Publié
+              - value: archived
+                label: Archivé
+              - value: cancelled
+                label: Annulé
+          - name: comment
+            label: Commentaire
+            component: localized
+          - name: sourceRef
+            label: Référence de source
+            type: string
+          - name: details
+            label: Détails de discipline
+            type: object
+            description: Remplir uniquement les champs de la discipline choisie.
+            fields:
+              - name: discipline
+                label: Discipline des détails
+                type: select
+                options:
+                  - value: kyorugi
+                    label: Kyorugi
+                  - value: poomsae
+                    label: Poomsae
+              - name: weightCategory
+                label: Catégorie de poids
+                component: localized
+              - name: ageCategory
+                label: Catégorie d'âge
+                component: localized
+              - name: bouts
+                label: Nombre de combats
+                type: number
+              - name: category
+                label: Catégorie Poomsae
+                component: localized
+              - name: poomsaeType
+                label: Type de Poomsae
+                component: localized
+          - name: createdAt
+            label: Créé le
+            type: date
+            required: true
+          - name: createdBy
+            label: Créé par
+            type: string
+            required: true
+          - name: updatedAt
+            label: Modifié le
+            type: date
+            required: true
+          - name: updatedBy
+            label: Modifié par
+            type: string
+            required: true
+          - name: changeSummary
+            label: Résumé des changements
+            component: localized
+          - name: demo
+            label: Démonstration
+            type: boolean
+
+  - name: schedules
+    label: Horaires
+    type: group
+    items:
+      - name: courseSchedules
+        label: Cours récurrents
+        type: collection
+        path: src/content/course-schedules
+        format: json
+        filename: "{id}.json"
+        view:
+          primary: name.fr
+        operations:
+          rename: false
+          delete: false
+        fields:
+          - name: id
+            label: Identifiant stable
+            type: string
+            required: true
+          - name: name
+            label: Nom
+            component: localized
+          - name: discipline
+            label: Discipline
+            type: select
+            options:
+              - value: kyorugi
+                label: Kyorugi
+              - value: poomsae
+                label: Poomsae
+          - name: dayOfWeek
+            label: Jour
+            type: select
+            options:
+              - value: monday
+                label: Lundi
+              - value: tuesday
+                label: Mardi
+              - value: wednesday
+                label: Mercredi
+              - value: thursday
+                label: Jeudi
+              - value: friday
+                label: Vendredi
+              - value: saturday
+                label: Samedi
+              - value: sunday
+                label: Dimanche
+          - name: startTime
+            label: Heure de début
+            type: string
+            pattern: "^([01]\\d|2[0-3]):[0-5]\\d$"
+          - name: endTime
+            label: Heure de fin
+            type: string
+            pattern: "^([01]\\d|2[0-3]):[0-5]\\d$"
+          - name: timeZone
+            label: Fuseau
+            type: string
+            readonly: true
+          - name: location
+            label: Lieu
+            component: localized
+          - name: group
+            label: Groupe
+            component: localized
+          - name: description
+            label: Description
+            component: localized
+          - name: validFrom
+            label: Valide à partir de
+            type: date
+            options:
+              time: false
+          - name: validTo
+            label: Valide jusqu'au
+            type: date
+            options:
+              time: false
+          - name: status
+            label: Statut
+            type: select
+            options:
+              - value: active
+                label: Actif
+              - value: suspended
+                label: Suspendu
+              - value: archived
+                label: Archivé
+          - name: displayOrder
+            label: Ordre
+            type: number
+          - name: demo
+            label: Démonstration
+            type: boolean
+
+      - name: scheduleExceptions
+        label: Exceptions ponctuelles
+        type: collection
+        path: src/content/schedule-exceptions
+        format: json
+        filename: "{id}.json"
+        operations:
+          rename: false
+          delete: false
+        fields:
+          - name: id
+            label: Identifiant stable
+            type: string
+            required: true
+          - name: scheduleId
+            label: Identifiant du cours
+            type: string
+            required: true
+          - name: date
+            label: Date concernée
+            type: date
+            options:
+              time: false
+          - name: kind
+            label: Type
+            type: select
+            options:
+              - value: cancelled
+                label: Annulation
+              - value: time-change
+                label: Changement d'heure
+              - value: location-change
+                label: Changement de lieu
+              - value: custom
+                label: Information
+          - name: startTime
+            label: Nouvelle heure de début
+            type: string
+          - name: endTime
+            label: Nouvelle heure de fin
+            type: string
+          - name: location
+            label: Nouveau lieu
+            component: localized
+          - name: message
+            label: Message
+            component: localized
+          - name: status
+            label: Statut
+            type: select
+            options:
+              - value: draft
+                label: Brouillon
+              - value: published
+                label: Publié
+              - value: archived
+                label: Archivé
+          - name: demo
+            label: Démonstration
+            type: boolean
+
+  - name: editorial
+    label: Éditorial
+    type: group
+    items:
+      - name: pages
+        label: Pages
+        type: collection
+        path: src/content/pages
+        format: json
+        filename: "{id}.json"
+        operations:
+          rename: false
+          delete: false
+        fields:
+          - name: id
+            label: Identifiant stable
+            type: string
+            required: true
+          - name: route
+            label: Routes
+            component: localized
+          - name: title
+            label: Titre
+            component: localized
+          - name: lead
+            label: Introduction
+            component: localized
+          - name: body
+            label: Contenu
+            component: localized
+          - name: status
+            label: Statut
+            type: select
+            options:
+              - value: draft
+                label: Brouillon
+              - value: published
+                label: Publié
+              - value: archived
+                label: Archivé
+              - value: cancelled
+                label: Annulé
+          - name: demo
+            label: Démonstration
+            type: boolean
+
+      - name: news
+        label: Actualités
+        type: collection
+        path: src/content/news
+        format: json
+        filename: "{id}.json"
+        operations:
+          rename: false
+          delete: false
+        fields:
+          - name: id
+            label: Identifiant stable
+            type: string
+            required: true
+          - name: route
+            label: Routes
+            component: localized
+          - name: title
+            label: Titre
+            component: localized
+          - name: excerpt
+            label: Extrait
+            component: localized
+          - name: body
+            label: Contenu
+            component: localized
+          - name: publishedAt
+            label: Date de publication
+            type: date
+          - name: status
+            label: Statut
+            type: select
+            options:
+              - value: draft
+                label: Brouillon
+              - value: published
+                label: Publié
+              - value: archived
+                label: Archivé
+              - value: cancelled
+                label: Annulé
+          - name: demo
+            label: Démonstration
+            type: boolean
+
+      - name: events
+        label: Événements
+        type: collection
+        path: src/content/events
+        format: json
+        filename: "{id}.json"
+        operations:
+          rename: false
+          delete: false
+        fields:
+          - name: id
+            label: Identifiant stable
+            type: string
+          - name: route
+            label: Routes
+            component: localized
+          - name: title
+            label: Titre
+            component: localized
+          - name: description
+            label: Description
+            component: localized
+          - name: startDateTime
+            label: Début
+            type: date
+          - name: endDateTime
+            label: Fin
+            type: date
+          - name: timeZone
+            label: Fuseau
+            type: string
+          - name: location
+            label: Lieu
+            component: localized
+          - name: disciplines
+            label: Disciplines
+            type: select
+            list: true
+            options:
+              - value: kyorugi
+                label: Kyorugi
+              - value: poomsae
+                label: Poomsae
+          - name: status
+            label: Statut
+            type: select
+            options:
+              - value: draft
+                label: Brouillon
+              - value: published
+                label: Publié
+              - value: archived
+                label: Archivé
+              - value: cancelled
+                label: Annulé
+          - name: demo
+            label: Démonstration
+            type: boolean
+
+      - name: media
+        label: Médias autorisés
+        type: collection
+        path: src/content/media
+        format: json
+        filename: "{id}.json"
+        operations:
+          rename: false
+          delete: false
+        fields:
+          - name: id
+            label: Identifiant stable
+            type: string
+          - name: kind
+            label: Type
+            type: select
+            options:
+              - value: photo
+                label: Photo
+              - value: youtube
+                label: YouTube
+          - name: title
+            label: Titre
+            component: localized
+          - name: description
+            label: Description
+            component: localized
+          - name: source
+            label: Source ou identifiant
+            type: string
+          - name: alt
+            label: Texte alternatif
+            component: localized
+          - name: credit
+            label: Crédit
+            type: string
+          - name: rightsStatus
+            label: Droits
+            type: select
+            options:
+              - value: approved
+                label: Approuvés
+              - value: pending
+                label: En attente
+              - value: withdrawn
+                label: Retirés
+          - name: status
+            label: Statut
+            type: select
+            options:
+              - value: draft
+                label: Brouillon
+              - value: published
+                label: Publié
+              - value: archived
+                label: Archivé
+              - value: cancelled
+                label: Annulé
+          - name: demo
+            label: Démonstration
+            type: boolean

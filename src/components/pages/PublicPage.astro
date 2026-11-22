@@ -1,0 +1,1218 @@
+---
+import { getCollection, getEntry } from "astro:content";
+import logo from "../../../logo.jpg";
+import { SOCIAL_LINKS, type Language } from "../../config/site";
+import { calculateHonours } from "../../domain/honours";
+import {
+  listCurrentSchedules,
+  type DayOfWeek,
+} from "../../domain/schedules";
+import { getUi } from "../../i18n/ui";
+import {
+  route,
+  withBasePath,
+  type RouteKey,
+} from "../../i18n/routes";
+import { formatDate, formatDateTime, localize } from "../../lib/content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import DemoNotice from "../content/DemoNotice.astro";
+import PageHero from "../content/PageHero.astro";
+
+export type PublicPageKey =
+  | RouteKey
+  | "athleteProfile"
+  | "competitionDetail";
+
+interface Props {
+  lang: Language;
+  page: PublicPageKey;
+  entryId?: string;
+}
+
+const { lang, page, entryId } = Astro.props;
+const t = getUi(lang);
+const other: Language = lang === "fr" ? "en" : "fr";
+
+const athletes = (await getCollection("athletes")).filter(
+  ({ data }) =>
+    data.status === "published" && data.profileVisibility === "public",
+);
+const competitions = (await getCollection("competitions")).filter(
+  ({ data }) => data.status === "published",
+);
+const results = (await getCollection("results")).filter(
+  ({ data }) => data.status === "published",
+);
+const honours = calculateHonours(
+  (await getCollection("results")).map(({ data }) => data),
+);
+const news = (await getCollection("news")).filter(
+  ({ data }) => data.status === "published",
+);
+const events = (await getCollection("events")).filter(
+  ({ data }) => data.status === "published",
+);
+const media = (await getCollection("media")).filter(
+  ({ data }) =>
+    data.status === "published" && data.rightsStatus === "approved",
+);
+const today = new Date().toISOString().slice(0, 10);
+const schedules = listCurrentSchedules(
+  (await getCollection("courseSchedules")).map(({ data }) => data),
+  today,
+);
+
+const athlete = entryId
+  ? athletes.find(({ data }) => data.id === entryId)
+  : undefined;
+const competition = entryId
+  ? competitions.find(({ data }) => data.id === entryId)
+  : undefined;
+const athleteById = new Map(
+  athletes.map(({ data }) => [data.id, localize(data.displayName, lang)]),
+);
+const competitionById = new Map(
+  competitions.map(({ data }) => [data.id, localize(data.name, lang)]),
+);
+
+const pageMeta: Record<
+  Exclude<PublicPageKey, "athleteProfile" | "competitionDetail">,
+  { fr: [string, string]; en: [string, string] }
+> = {
+  home: {
+    fr: [
+      "VAN THUYNE TAEKWONDO / ELITE",
+      "Site bilingue du club consacré au Kyorugi et au Poomsae.",
+    ],
+    en: [
+      "VAN THUYNE TAEKWONDO / ELITE",
+      "The club’s bilingual website for Kyorugi and Poomsae.",
+    ],
+  },
+  club: {
+    fr: [
+      "Le club",
+      "Une présentation à compléter avec les informations officielles validées.",
+    ],
+    en: [
+      "The club",
+      "A presentation to be completed with approved official information.",
+    ],
+  },
+  coaching: {
+    fr: [
+      "Encadrement",
+      "L’équipe d’encadrement sera présentée après validation des informations et des droits à l’image.",
+    ],
+    en: [
+      "Coaching team",
+      "The coaching team will be presented after details and image rights have been approved.",
+    ],
+  },
+  disciplines: {
+    fr: [
+      "Disciplines",
+      "Le Kyorugi est la discipline principale ; le Poomsae bénéficie d’une présentation complète.",
+    ],
+    en: [
+      "Disciplines",
+      "Kyorugi is the primary discipline; Poomsae receives full coverage.",
+    ],
+  },
+  kyorugi: {
+    fr: [
+      "Kyorugi — combat",
+      "Une discipline olympique fondée sur la tactique, la vitesse et la maîtrise.",
+    ],
+    en: [
+      "Kyorugi — sparring",
+      "An Olympic discipline built on tactics, speed and control.",
+    ],
+  },
+  poomsae: {
+    fr: [
+      "Poomsae — formes",
+      "Une pratique technique structurée autour de l’exécution et de la précision.",
+    ],
+    en: [
+      "Poomsae — forms",
+      "A technical practice focused on execution and precision.",
+    ],
+  },
+  athletes: {
+    fr: [
+      "Athlètes",
+      "Profils de démonstration sans identité ni performance sportive réelle.",
+    ],
+    en: [
+      "Athletes",
+      "Demonstration profiles with no real identities or sporting claims.",
+    ],
+  },
+  competitions: {
+    fr: [
+      "Compétitions",
+      "Calendrier et fiches de compétition structurés pour les deux disciplines.",
+    ],
+    en: [
+      "Competitions",
+      "Structured competition calendar and detail pages for both disciplines.",
+    ],
+  },
+  results: {
+    fr: [
+      "Résultats",
+      "Résultats fictifs publiés pour valider l’affichage et les règles métier.",
+    ],
+    en: [
+      "Results",
+      "Published fictional results used to validate presentation and business rules.",
+    ],
+  },
+  honours: {
+    fr: [
+      "Palmarès",
+      "Statistiques calculées uniquement à partir des résultats publiés et valides.",
+    ],
+    en: [
+      "Honours",
+      "Statistics calculated only from valid published results.",
+    ],
+  },
+  schedules: {
+    fr: [
+      "Horaires des cours",
+      "Les horaires réels seront publiés après communication et validation par le club.",
+    ],
+    en: [
+      "Class schedule",
+      "Real class times will be published after they are supplied and approved by the club.",
+    ],
+  },
+  calendar: {
+    fr: [
+      "Calendrier",
+      "Événements à venir, avec des exemples clairement identifiés.",
+    ],
+    en: [
+      "Calendar",
+      "Upcoming events, with examples clearly labelled.",
+    ],
+  },
+  news: {
+    fr: [
+      "Actualités",
+      "Un espace bilingue destiné aux informations validées du club.",
+    ],
+    en: [
+      "News",
+      "A bilingual area for club-approved updates.",
+    ],
+  },
+  media: {
+    fr: [
+      "Photos et vidéos",
+      "Seuls les médias dont les droits ont été confirmés peuvent être publiés.",
+    ],
+    en: [
+      "Photos and videos",
+      "Only media with confirmed rights may be published.",
+    ],
+  },
+  contact: {
+    fr: [
+      "Contact",
+      "Un formulaire limité aux informations nécessaires, sans envoi réel dans cet environnement.",
+    ],
+    en: [
+      "Contact",
+      "A form limited to necessary information, with no real sending in this environment.",
+    ],
+  },
+  legal: {
+    fr: [
+      "Mentions légales",
+      "Informations à compléter et à valider avant toute mise en ligne.",
+    ],
+    en: [
+      "Legal notice",
+      "Information to be completed and approved before publication.",
+    ],
+  },
+  privacy: {
+    fr: [
+      "Politique de confidentialité",
+      "Transparence sur les données collectées et leur utilisation.",
+    ],
+    en: [
+      "Privacy policy",
+      "Transparency about collected data and how it is used.",
+    ],
+  },
+};
+
+const dynamicMeta =
+  page === "athleteProfile"
+    ? [
+        athlete
+          ? localize(athlete.data.displayName, lang)
+          : lang === "fr"
+            ? "Profil introuvable"
+            : "Profile not found",
+        lang === "fr"
+          ? "Profil sportif de démonstration."
+          : "Demonstration athlete profile.",
+      ]
+    : page === "competitionDetail"
+      ? [
+          competition
+            ? localize(competition.data.name, lang)
+            : lang === "fr"
+              ? "Compétition introuvable"
+              : "Competition not found",
+          lang === "fr"
+            ? "Fiche de compétition et résultats associés."
+            : "Competition details and associated results.",
+        ]
+      : pageMeta[page][lang];
+
+const [title, description] = dynamicMeta;
+const parentKey: RouteKey =
+  page === "athleteProfile"
+    ? "athletes"
+    : page === "competitionDetail"
+      ? "competitions"
+      : page;
+const alternatePath =
+  page === "athleteProfile"
+    ? withBasePath(`${other}/athletes/${entryId}/`)
+    : page === "competitionDetail" && competition
+      ? withBasePath(
+          `${other}/competitions/${localize(competition.data.route, other)}/`,
+        )
+      : route(other, parentKey);
+const breadcrumbs =
+  page === "home"
+    ? []
+    : [
+        { label: t.home, href: route(lang, "home") },
+        ...(page === "athleteProfile"
+          ? [{ label: t.athletes, href: route(lang, "athletes") }]
+          : page === "competitionDetail"
+            ? [
+                {
+                  label: t.competitions,
+                  href: route(lang, "competitions"),
+                },
+              ]
+            : []),
+        { label: title },
+      ];
+
+const clubPage = await getEntry("pages", "club");
+const kyorugiPage = await getEntry("pages", "kyorugi");
+const poomsaePage = await getEntry("pages", "poomsae");
+const competitionResults = competition
+  ? results.filter(({ data }) => data.competitionId === competition.data.id)
+  : [];
+
+function resultParticipants(ids: string[]): string {
+  return ids
+    .map(
+      (id) =>
+        athleteById.get(id) ??
+        (lang === "fr" ? "Profil indisponible" : "Profile unavailable"),
+    )
+    .join(", ");
+}
+
+function medalLabel(value: "none" | "bronze" | "silver" | "gold"): string {
+  const labels = {
+    fr: { none: "Aucune", bronze: "Bronze", silver: "Argent", gold: "Or" },
+    en: { none: "None", bronze: "Bronze", silver: "Silver", gold: "Gold" },
+  };
+  return labels[lang][value];
+}
+
+function dayLabel(day: DayOfWeek): string {
+  const labels = {
+    fr: {
+      monday: "Lundi",
+      tuesday: "Mardi",
+      wednesday: "Mercredi",
+      thursday: "Jeudi",
+      friday: "Vendredi",
+      saturday: "Samedi",
+      sunday: "Dimanche",
+    },
+    en: {
+      monday: "Monday",
+      tuesday: "Tuesday",
+      wednesday: "Wednesday",
+      thursday: "Thursday",
+      friday: "Friday",
+      saturday: "Saturday",
+      sunday: "Sunday",
+    },
+  };
+  return labels[lang][day];
+}
+---
+
+<BaseLayout
+  lang={lang}
+  title={title}
+  description={description}
+  alternatePath={alternatePath}
+>
+  <PageHero
+    lang={lang}
+    title={title}
+    lead={description}
+    breadcrumbs={breadcrumbs}
+    compact={page !== "home"}
+  >
+    {
+      page === "home" && (
+        <div class="hero-actions">
+          <a class="button button-primary" href={route(lang, "kyorugi")}>
+            {lang === "fr" ? "Découvrir le Kyorugi" : "Discover Kyorugi"}
+          </a>
+          <a class="button button-ghost" href={route(lang, "poomsae")}>
+            {lang === "fr" ? "Explorer le Poomsae" : "Explore Poomsae"}
+          </a>
+        </div>
+      )
+    }
+  </PageHero>
+
+  {
+    page === "home" && (
+      <>
+        <section class="section">
+          <div class="site-container">
+            <DemoNotice lang={lang} />
+            <div class="section-heading section-heading-spaced">
+              <div>
+                <p class="eyebrow">
+                  {lang === "fr" ? "Deux disciplines" : "Two disciplines"}
+                </p>
+                <h2>
+                  {lang === "fr"
+                    ? "Combat en priorité, technique en profondeur"
+                    : "Sparring first, technique in depth"}
+                </h2>
+              </div>
+            </div>
+            <div class="grid-2">
+              <article class="card feature-card feature-card-primary">
+                <span class="tag tag-kyorugi">Kyorugi</span>
+                <h3>{lang === "fr" ? "Combat" : "Sparring"}</h3>
+                <p>
+                  {lang === "fr"
+                    ? "Tactique, vitesse, engagement et maîtrise dans une discipline olympique."
+                    : "Tactics, speed, commitment and control in an Olympic discipline."}
+                </p>
+                <a href={route(lang, "kyorugi")}>{t.learnMore}</a>
+              </article>
+              <article class="card feature-card">
+                <span class="tag tag-poomsae">Poomsae</span>
+                <h3>{lang === "fr" ? "Formes" : "Forms"}</h3>
+                <p>
+                  {lang === "fr"
+                    ? "Précision, équilibre, rythme et expression technique."
+                    : "Precision, balance, rhythm and technical expression."}
+                </p>
+                <a href={route(lang, "poomsae")}>{t.learnMore}</a>
+              </article>
+            </div>
+          </div>
+        </section>
+        <section class="section section-dark">
+          <div class="site-container">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">
+                  {lang === "fr" ? "Parcours du site" : "Explore the website"}
+                </p>
+                <h2>
+                  {lang === "fr"
+                    ? "Du calendrier au palmarès"
+                    : "From calendar to honours"}
+                </h2>
+              </div>
+            </div>
+            <div class="grid-4">
+              {[
+                ["competitions", t.competitions],
+                ["results", t.results],
+                ["honours", t.honours],
+                ["schedules", t.schedules],
+              ].map(([key, label]) => (
+                <a class="card card-dark link-card" href={route(lang, key as RouteKey)}>
+                  <strong>{label}</strong>
+                  <span aria-hidden="true">→</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      </>
+    )
+  }
+
+  {
+    page === "club" && (
+      <section class="section">
+        <div class="site-container reading-width content-stack">
+          <DemoNotice lang={lang} />
+          <h2>{clubPage ? localize(clubPage.data.title, lang) : title}</h2>
+          <p class="lead">
+            {clubPage ? localize(clubPage.data.lead, lang) : t.noContent}
+          </p>
+          <p>{clubPage ? localize(clubPage.data.body, lang) : t.noContent}</p>
+          <a class="button button-secondary" href={route(lang, "coaching")}>
+            {t.coaching}
+          </a>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    page === "coaching" && (
+      <section class="section">
+        <div class="site-container">
+          <div class="empty-state reading-width">
+            <h2>{t.noContent}</h2>
+            <p>
+              {lang === "fr"
+                ? "Les noms, fonctions, qualifications et portraits ne seront ajoutés qu’après validation explicite du club."
+                : "Names, roles, qualifications and portraits will be added only after explicit club approval."}
+            </p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    page === "disciplines" && (
+      <section class="section">
+        <div class="site-container grid-2">
+          <article class="card feature-card-primary">
+            <span class="tag tag-kyorugi">Kyorugi</span>
+            <h2>{lang === "fr" ? "Combat" : "Sparring"}</h2>
+            <p>{kyorugiPage && localize(kyorugiPage.data.body, lang)}</p>
+            <a class="button button-primary" href={route(lang, "kyorugi")}>
+              {t.learnMore}
+            </a>
+          </article>
+          <article class="card">
+            <span class="tag tag-poomsae">Poomsae</span>
+            <h2>{lang === "fr" ? "Formes" : "Forms"}</h2>
+            <p>{poomsaePage && localize(poomsaePage.data.body, lang)}</p>
+            <a class="button button-secondary" href={route(lang, "poomsae")}>
+              {t.learnMore}
+            </a>
+          </article>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    (page === "kyorugi" || page === "poomsae") && (
+      <section class="section">
+        <div class="site-container content-layout">
+          <div class="reading-width content-stack">
+            <DemoNotice lang={lang} />
+            <h2>
+              {page === "kyorugi"
+                ? lang === "fr"
+                  ? "Comprendre le Kyorugi"
+                  : "Understanding Kyorugi"
+                : lang === "fr"
+                  ? "Comprendre le Poomsae"
+                  : "Understanding Poomsae"}
+            </h2>
+            <p class="lead">
+              {localize(
+                page === "kyorugi"
+                  ? kyorugiPage?.data.lead
+                  : poomsaePage?.data.lead,
+                lang,
+              )}
+            </p>
+            <p>
+              {localize(
+                page === "kyorugi"
+                  ? kyorugiPage?.data.body
+                  : poomsaePage?.data.body,
+                lang,
+              )}
+            </p>
+          </div>
+          <aside class="card">
+            <h2>{lang === "fr" ? "À consulter" : "Related pages"}</h2>
+            <a href={route(lang, "athletes")}>{t.athletes}</a>
+            <a href={route(lang, "competitions")}>{t.competitions}</a>
+            <a href={route(lang, "results")}>{t.results}</a>
+          </aside>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    page === "athletes" && (
+      <section class="section">
+        <div class="site-container">
+          <DemoNotice lang={lang} />
+          <div class="grid-3 cards-spaced">
+            {athletes.map(({ data }) => (
+              <article class="card">
+                <div class="avatar-placeholder" aria-hidden="true">
+                  {localize(data.displayName, lang).slice(-1)}
+                </div>
+                <div class="tag-row">
+                  {data.disciplines.map((value) => (
+                    <span class={`tag tag-${value}`}>
+                      {value === "kyorugi" ? "Kyorugi" : "Poomsae"}
+                    </span>
+                  ))}
+                </div>
+                <h2>{localize(data.displayName, lang)}</h2>
+                <p>{localize(data.sportCategory, lang)}</p>
+                <a href={withBasePath(`${lang}/athletes/${data.id}/`)}>
+                  {lang === "fr" ? "Voir le profil" : "View profile"}
+                </a>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    page === "athleteProfile" && (
+      <section class="section">
+        <div class="site-container">
+          {athlete ? (
+            <div class="content-layout">
+              <article class="content-stack">
+                <DemoNotice lang={lang} />
+                <div class="tag-row">
+                  {athlete.data.disciplines.map((value) => (
+                    <span class={`tag tag-${value}`}>
+                      {value === "kyorugi" ? "Kyorugi" : "Poomsae"}
+                    </span>
+                  ))}
+                </div>
+                <h2>{localize(athlete.data.sportCategory, lang)}</h2>
+                <p class="lead">{localize(athlete.data.biography, lang)}</p>
+              </article>
+              <aside class="card">
+                <h2>{lang === "fr" ? "Résultats publiés" : "Published results"}</h2>
+                <strong class="large-number">
+                  {
+                    results.filter(({ data }) =>
+                      data.athleteIds.includes(athlete.data.id),
+                    ).length
+                  }
+                </strong>
+                <p>
+                  {lang === "fr"
+                    ? "Exemples fictifs dans ce prototype."
+                    : "Fictional examples in this prototype."}
+                </p>
+              </aside>
+            </div>
+          ) : (
+            <div class="notice notice-error">
+              {lang === "fr" ? "Profil introuvable." : "Profile not found."}
+            </div>
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    page === "competitions" && (
+      <section class="section">
+        <div class="site-container">
+          <DemoNotice lang={lang} />
+          <div class="grid-3 cards-spaced">
+            {competitions.map(({ data }) => (
+              <article class="card">
+                <div class="tag-row">
+                  {data.disciplines.map((value) => (
+                    <span class={`tag tag-${value}`}>
+                      {value === "kyorugi" ? "Kyorugi" : "Poomsae"}
+                    </span>
+                  ))}
+                </div>
+                <p class="eyebrow">{formatDate(data.startDate, lang)}</p>
+                <h2>{localize(data.name, lang)}</h2>
+                <p>
+                  {localize(data.location.city, lang)} ·{" "}
+                  {localize(data.level, lang)}
+                </p>
+                <p>{localize(data.summary, lang)}</p>
+                <a
+                  href={withBasePath(
+                    `${lang}/competitions/${localize(data.route, lang)}/`,
+                  )}
+                >
+                  {lang === "fr" ? "Voir la fiche" : "View details"}
+                </a>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    page === "competitionDetail" && (
+      <section class="section">
+        <div class="site-container">
+          {competition ? (
+            <div class="content-stack">
+              <DemoNotice lang={lang} />
+              <div class="grid-3">
+                <div class="card">
+                  <strong>{lang === "fr" ? "Date" : "Date"}</strong>
+                  <p>{formatDate(competition.data.startDate, lang)}</p>
+                </div>
+                <div class="card">
+                  <strong>{lang === "fr" ? "Lieu" : "Venue"}</strong>
+                  <p>
+                    {localize(competition.data.location.venue, lang)},{" "}
+                    {localize(competition.data.location.city, lang)}
+                  </p>
+                </div>
+                <div class="card">
+                  <strong>{lang === "fr" ? "Niveau" : "Level"}</strong>
+                  <p>{localize(competition.data.level, lang)}</p>
+                </div>
+              </div>
+              <h2>{lang === "fr" ? "Résultats associés" : "Associated results"}</h2>
+              {competitionResults.length ? (
+                <div class="grid-2">
+                  {competitionResults.map(({ data }) => (
+                    <article class="card">
+                      <span class={`tag tag-${data.discipline}`}>
+                        {data.discipline === "kyorugi" ? "Kyorugi" : "Poomsae"}
+                      </span>
+                      <h3>{resultParticipants(data.athleteIds)}</h3>
+                      <p>
+                        {lang === "fr" ? "Classement" : "Rank"}:{" "}
+                        {data.rank ?? "—"} · {medalLabel(data.medal)}
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <div class="empty-state">{t.noContent}</div>
+              )}
+            </div>
+          ) : (
+            <div class="notice notice-error">
+              {lang === "fr"
+                ? "Compétition introuvable."
+                : "Competition not found."}
+            </div>
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    page === "results" && (
+      <section class="section">
+        <div class="site-container content-stack">
+          <DemoNotice lang={lang} />
+          <div
+            class="table-scroll"
+            role="region"
+            aria-label={lang === "fr" ? "Tableau des résultats publiés" : "Published results table"}
+            tabindex="0"
+          >
+            <table class="results-table">
+              <caption>
+                {lang === "fr" ? "Résultats publiés" : "Published results"}
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">{t.competitions}</th>
+                  <th scope="col">{t.athletes}</th>
+                  <th scope="col">{lang === "fr" ? "Discipline" : "Discipline"}</th>
+                  <th scope="col">{lang === "fr" ? "Classement" : "Rank"}</th>
+                  <th scope="col">{lang === "fr" ? "Médaille" : "Medal"}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {results.map(({ data }) => (
+                  <tr>
+                    <td>{competitionById.get(data.competitionId) ?? "—"}</td>
+                    <td>{resultParticipants(data.athleteIds)}</td>
+                    <td>{data.discipline === "kyorugi" ? "Kyorugi" : "Poomsae"}</td>
+                    <td>{data.rank ?? "—"}</td>
+                    <td>{medalLabel(data.medal)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div class="result-cards">
+            {results.map(({ data }) => (
+              <article class="card">
+                <span class={`tag tag-${data.discipline}`}>
+                  {data.discipline === "kyorugi" ? "Kyorugi" : "Poomsae"}
+                </span>
+                <h2>{resultParticipants(data.athleteIds)}</h2>
+                <p>{competitionById.get(data.competitionId) ?? "—"}</p>
+                <p>
+                  {lang === "fr" ? "Classement" : "Rank"}: {data.rank ?? "—"} ·{" "}
+                  {medalLabel(data.medal)}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    page === "honours" && (
+      <section class="section section-dark">
+        <div class="site-container content-stack">
+          <DemoNotice lang={lang} />
+          <div class="stat-grid">
+            <div class="stat">
+              <span class="stat-value">{honours.participations}</span>
+              <span>{lang === "fr" ? "Participations" : "Entries"}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">{honours.medals.gold}</span>
+              <span>{lang === "fr" ? "Or" : "Gold"}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">{honours.medals.silver}</span>
+              <span>{lang === "fr" ? "Argent" : "Silver"}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">{honours.medals.bronze}</span>
+              <span>Bronze</span>
+            </div>
+          </div>
+          <div class="grid-3">
+            <article class="card card-dark">
+              <span class="tag tag-kyorugi">Kyorugi</span>
+              <h2>{honours.byDiscipline.kyorugi.participations}</h2>
+              <p>{lang === "fr" ? "participations publiées" : "published entries"}</p>
+            </article>
+            <article class="card card-dark">
+              <span class="tag tag-poomsae">Poomsae</span>
+              <h2>{honours.byDiscipline.poomsae.participations}</h2>
+              <p>{lang === "fr" ? "participations publiées" : "published entries"}</p>
+            </article>
+            <article class="card card-dark">
+              <h2>{honours.distinctCompetitions}</h2>
+              <p>{lang === "fr" ? "compétitions distinctes" : "distinct competitions"}</p>
+            </article>
+          </div>
+          <p>
+            {lang === "fr"
+              ? "Une équipe compte comme une seule participation et une seule médaille. Les brouillons, annulations et archives sont exclus."
+              : "A team counts as one entry and one medal. Drafts, cancellations and archives are excluded."}
+          </p>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    page === "schedules" && (
+      <section class="section">
+        <div class="site-container">
+          {schedules.length ? (
+            <div class="content-stack">
+              <div class="notice notice-info">
+                {lang === "fr"
+                  ? "Fuseau horaire : Europe/Paris. Consultez les exceptions annoncées avant de vous déplacer."
+                  : "Time zone: Europe/Paris. Check announced exceptions before travelling."}
+              </div>
+              <div class="schedule-grid">
+                {schedules.map((schedule) => (
+                  <article class="card schedule-card">
+                    <div>
+                      <p class="eyebrow">{dayLabel(schedule.dayOfWeek)}</p>
+                      <h2>{localize(schedule.name, lang)}</h2>
+                      <p>
+                        <strong>
+                          {schedule.startTime}–{schedule.endTime}
+                        </strong>
+                      </p>
+                    </div>
+                    <div>
+                      <span class={`tag tag-${schedule.discipline}`}>
+                        {schedule.discipline === "kyorugi"
+                          ? "Kyorugi"
+                          : "Poomsae"}
+                      </span>
+                      <p>{localize(schedule.group, lang)}</p>
+                      <p>{localize(schedule.location, lang)}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div class="empty-state reading-width">
+              <h2>
+                {lang === "fr"
+                  ? "Horaires à communiquer"
+                  : "Schedule to be provided"}
+              </h2>
+              <p>
+                {lang === "fr"
+                  ? "Aucun horaire actif n’est publié. Les exemples techniques archivés ne sont jamais affichés comme des cours réels."
+                  : "No active schedule is published. Archived technical examples are never shown as real classes."}
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    page === "calendar" && (
+      <section class="section">
+        <div class="site-container content-stack">
+          <DemoNotice lang={lang} />
+          <div class="grid-2">
+            {events.map(({ data }) => (
+              <article class="card">
+                <p class="eyebrow">{formatDateTime(data.startDateTime, lang)}</p>
+                <h2>{localize(data.title, lang)}</h2>
+                <p>{localize(data.description, lang)}</p>
+                <p>
+                  <strong>{lang === "fr" ? "Lieu" : "Venue"}:</strong>{" "}
+                  {localize(data.location, lang)}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    page === "news" && (
+      <section class="section">
+        <div class="site-container content-stack">
+          <DemoNotice lang={lang} />
+          <div class="grid-2">
+            {news.map(({ data }) => (
+              <article class="card">
+                <p class="eyebrow">{formatDate(data.publishedAt, lang)}</p>
+                <h2>{localize(data.title, lang)}</h2>
+                <p class="lead">{localize(data.excerpt, lang)}</p>
+                <p>{localize(data.body, lang)}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    page === "media" && (
+      <section class="section">
+        <div class="site-container content-stack">
+          <div class="notice notice-info">
+            {lang === "fr"
+              ? "Aucune photo d’athlète n’est publiée sans autorisation. La ressource ci-dessous est le logo fourni dans le projet."
+              : "No athlete photo is published without permission. The asset below is the logo supplied with the project."}
+          </div>
+          <div class="card">
+            <h2>{lang === "fr" ? "Canaux officiels fournis" : "Provided official channels"}</h2>
+            <p>
+              {lang === "fr"
+                ? "Les vidéos restent accessibles par lien direct ; aucun lecteur tiers ni suivi n’est chargé automatiquement."
+                : "Videos remain available through direct links; no third-party player or tracking loads automatically."}
+            </p>
+            <div class="hero-actions">
+              <a
+                class="button button-secondary"
+                href={SOCIAL_LINKS.instagram}
+                rel="noopener"
+              >
+                Instagram
+              </a>
+              <a
+                class="button button-secondary"
+                href={SOCIAL_LINKS.youtube}
+                rel="noopener"
+              >
+                YouTube
+              </a>
+            </div>
+          </div>
+          <div class="grid-3">
+            {media.map(({ data }) => (
+              <figure class="card media-card">
+                {data.kind === "photo" && (
+                  <img
+                    src={data.source === "/logo.jpg" ? logo.src : data.source}
+                    alt={localize(data.alt, lang)}
+                    width="320"
+                    height="320"
+                    loading="lazy"
+                  />
+                )}
+                <figcaption>
+                  <strong>{localize(data.title, lang)}</strong>
+                  <span>{data.credit}</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    page === "contact" && (
+      <section class="section">
+        <div class="site-container content-layout">
+          <form
+            id="contact-form"
+            class="card form-grid"
+            data-language={lang}
+            novalidate
+          >
+            <div
+              id="contact-errors"
+              class="field-full notice notice-error"
+              role="alert"
+              tabindex="-1"
+              hidden
+            ></div>
+            <div
+              id="contact-success"
+              class="field-full notice notice-success"
+              role="status"
+              tabindex="-1"
+              hidden
+            ></div>
+            <div class="field">
+              <label for="contact-name">{lang === "fr" ? "Nom" : "Name"}</label>
+              <input
+                id="contact-name"
+                name="name"
+                autocomplete="name"
+                minlength="2"
+                maxlength="100"
+                required
+              />
+            </div>
+            <div class="field">
+              <label for="contact-email">
+                {lang === "fr" ? "Adresse e-mail" : "Email address"}
+              </label>
+              <input
+                id="contact-email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                maxlength="254"
+                required
+              />
+            </div>
+            <div class="field field-full">
+              <label for="contact-subject">{lang === "fr" ? "Objet" : "Subject"}</label>
+              <input
+                id="contact-subject"
+                name="subject"
+                minlength="3"
+                maxlength="150"
+                required
+              />
+            </div>
+            <div class="field field-full">
+              <label for="contact-message">{lang === "fr" ? "Message" : "Message"}</label>
+              <textarea
+                id="contact-message"
+                name="message"
+                minlength="10"
+                maxlength="5000"
+                aria-describedby="contact-message-help"
+                required
+              />
+              <span id="contact-message-help" class="field-help">
+                {lang === "fr"
+                  ? "Ne transmettez aucune donnée sensible, notamment concernant un mineur."
+                  : "Do not send sensitive information, particularly about a minor."}
+              </span>
+            </div>
+            <div class="sr-only" aria-hidden="true">
+              <label for="contact-website">Website</label>
+              <input
+                id="contact-website"
+                name="website"
+                tabindex="-1"
+                autocomplete="off"
+              />
+            </div>
+            <input name="startedAt" type="hidden" value="" />
+            <div class="field-full notice notice-warning">
+              {lang === "fr"
+                ? "Envoi désactivé : le destinataire et le fournisseur ne sont pas encore validés."
+                : "Sending disabled: the recipient and provider have not yet been approved."}
+            </div>
+            <button class="button button-primary field-full" type="submit">
+              {lang === "fr" ? "Vérifier le message" : "Check message"}
+            </button>
+          </form>
+          <aside class="card content-stack">
+            <h2>{lang === "fr" ? "Données collectées" : "Data collected"}</h2>
+            <p>
+              {lang === "fr"
+                ? "Nom, e-mail, objet et message uniquement."
+                : "Name, email, subject and message only."}
+            </p>
+            <a href={route(lang, "privacy")}>{t.privacy}</a>
+          </aside>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    (page === "legal" || page === "privacy") && (
+      <section class="section">
+        <div class="site-container reading-width content-stack">
+          <div class="notice notice-warning">
+            {lang === "fr"
+              ? "Document de préparation — validation du responsable du site requise avant mise en ligne."
+              : "Preparation document — website owner approval required before publication."}
+          </div>
+          {page === "legal" ? (
+            <>
+              <h2>{lang === "fr" ? "Informations manquantes" : "Missing information"}</h2>
+              <p>
+                {lang === "fr"
+                  ? "Éditeur, responsable de publication, coordonnées officielles, hébergeur et propriété intellectuelle restent à confirmer."
+                  : "Publisher, publication manager, official contact details, hosting provider and intellectual property information remain to be confirmed."}
+              </p>
+            </>
+          ) : (
+            <>
+              <h2>{lang === "fr" ? "Principes retenus" : "Agreed principles"}</h2>
+              <p>
+                {lang === "fr"
+                  ? "Minimisation des données, accès limité, suppression sur demande vérifiée et absence de données sensibles dans le formulaire."
+                  : "Data minimisation, restricted access, deletion after a verified request and no sensitive information in the form."}
+              </p>
+              <p>
+                {lang === "fr"
+                  ? "La durée de conservation et la base juridique seront validées avant activation de l’envoi."
+                  : "The retention period and legal basis will be approved before sending is enabled."}
+              </p>
+            </>
+          )}
+        </div>
+      </section>
+    )
+  }
+  <script>
+    import {
+      validateContactDraft,
+      type ContactDraft,
+    } from "../../domain/contact";
+
+    const contactForm =
+      document.querySelector<HTMLFormElement>("#contact-form");
+    const startedAt = contactForm?.elements.namedItem("startedAt");
+    if (startedAt instanceof HTMLInputElement) {
+      startedAt.value = String(Date.now());
+    }
+
+    contactForm?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const data = new FormData(contactForm);
+      const language =
+        contactForm.dataset.language === "en" ? ("en" as const) : ("fr" as const);
+      const draft: ContactDraft = {
+        name: String(data.get("name") ?? ""),
+        email: String(data.get("email") ?? ""),
+        subject: String(data.get("subject") ?? ""),
+        message: String(data.get("message") ?? ""),
+        language,
+        website: String(data.get("website") ?? ""),
+        startedAt: Number(data.get("startedAt")),
+      };
+      const result = validateContactDraft(draft);
+      const errorBox =
+        document.querySelector<HTMLElement>("#contact-errors");
+      const successBox =
+        document.querySelector<HTMLElement>("#contact-success");
+      errorBox?.setAttribute("hidden", "");
+      successBox?.setAttribute("hidden", "");
+
+      if (!result.valid) {
+        const labels = {
+          fr: {
+            name: "nom",
+            email: "adresse e-mail",
+            subject: "objet",
+            message: "message",
+            spam: "contrôle anti-spam",
+          },
+          en: {
+            name: "name",
+            email: "email address",
+            subject: "subject",
+            message: "message",
+            spam: "anti-spam check",
+          },
+        };
+        if (errorBox) {
+          errorBox.textContent =
+            language === "fr"
+              ? `Vérifiez les champs suivants : ${result.fields.map((field) => labels.fr[field]).join(", ")}.`
+              : `Check the following fields: ${result.fields.map((field) => labels.en[field]).join(", ")}.`;
+          errorBox.hidden = false;
+          errorBox.focus();
+        }
+        return;
+      }
+
+      if (successBox) {
+        successBox.textContent =
+          language === "fr"
+            ? "Message validé localement. Aucun message n’a été envoyé : le fournisseur et le destinataire restent à valider."
+            : "Message validated locally. Nothing was sent: the provider and recipient still require approval.";
+        successBox.hidden = false;
+        successBox.focus();
+      }
+      contactForm.reset();
+      const resetStartedAt = contactForm.elements.namedItem("startedAt");
+      if (resetStartedAt instanceof HTMLInputElement) {
+        resetStartedAt.value = String(Date.now());
+      }
+    });
+  </script>
+</BaseLayout>

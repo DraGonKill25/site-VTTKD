@@ -1,0 +1,33 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+---
+
+<AdminLayout
+  title="Tableau de bord"
+  description="Prototype local de l’administration VAN THUYNE TAEKWONDO."
+>
+  <section class="site-container admin-section content-stack">
+    <div>
+      <p class="eyebrow">Administration</p>
+      <h1>Tableau de bord</h1>
+      <p class="lead">
+        Démonstration des parcours administratifs sans compte réel ni
+        persistance de production.
+      </p>
+    </div>
+    <div class="grid-3">
+      <a class="card admin-action-card" href="/admin/results/">
+        <strong>Résultats sportifs</strong>
+        <span>Créer, vérifier, modifier et consulter l’historique.</span>
+      </a>
+      <div class="card">
+        <strong>Horaires</strong>
+        <span class="status-badge status-draft">Configuration CMS à venir</span>
+      </div>
+      <div class="card">
+        <strong>Comptes et permissions</strong>
+        <span class="status-badge status-draft">Aucun compte réel créé</span>
+      </div>
+    </div>
+  </section>
+</AdminLayout>

@@ -1,0 +1,22 @@
+{
+  "id": "demo-news",
+  "route": {
+    "fr": "actualite-de-demonstration",
+    "en": "demonstration-news"
+  },
+  "title": {
+    "fr": "Actualité de démonstration",
+    "en": "Demonstration news"
+  },
+  "excerpt": {
+    "fr": "Ce contenu fictif montre la présentation d’une actualité sans annoncer un fait réel du club.",
+    "en": "This fictional content demonstrates a news item without announcing a real club event."
+  },
+  "body": {
+    "fr": "Texte de démonstration à remplacer par un contenu validé par le club.",
+    "en": "Demonstration text to be replaced with club-approved content."
+  },
+  "publishedAt": "2026-01-15T09:00:00Z",
+  "status": "published",
+  "demo": true
+}

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Prototype UX/UI fictif de Phase 2 pour VAN THUYNE TAEKWONDO / ELITE."
+    />
+    <title>Prototype Phase 2 — VAN THUYNE TAEKWONDO / ELITE</title>
+    <link rel="stylesheet" href="prototype.css" />
+    <script src="demo-content.js" defer></script>
+    <script src="prototype.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#prototype-main">Aller au contenu du prototype</a>
+
+    <div class="prototype-banner" role="note">
+      <strong>Prototype Phase 2</strong>
+      <span>Contenu fictif — non destiné à la production</span>
+    </div>
+
+    <section class="review-toolbar" aria-labelledby="review-title">
+      <div>
+        <p class="eyebrow">Outil de revue</p>
+        <h1 id="review-title">Maquettes VTTKD</h1>
+      </div>
+
+      <div class="review-controls">
+        <label>
+          Écran
+          <select id="screen-select">
+            <option value="home">Accueil</option>
+            <option value="club">Club et encadrement</option>
+            <option value="disciplines">Disciplines</option>
+            <option value="kyorugi">Discipline — Kyorugi</option>
+            <option value="poomsae">Discipline — Poomsae</option>
+            <option value="athletes">Athlètes</option>
+            <option value="athlete">Profil athlète</option>
+            <option value="competitions">Compétitions</option>
+            <option value="competition">Détail compétition</option>
+            <option value="results">Résultats</option>
+            <option value="honours">Palmarès</option>
+            <option value="calendar">Calendrier</option>
+            <option value="news">Actualités</option>
+            <option value="media">Photos et vidéos</option>
+            <option value="contact">Contact</option>
+            <option value="admin-login">Admin — connexion</option>
+            <option value="admin-dashboard">Admin — tableau de bord</option>
+            <option value="admin-editor">Admin — édition compétition</option>
+            <option value="admin-contents">Admin — gestion contenus</option>
+            <option value="admin-athletes">Admin — gestion athlètes</option>
+            <option value="admin-competitions">Admin — gestion compétitions</option>
+            <option value="admin-results">Admin — liste résultats</option>
+            <option value="admin-result-create">Admin — création résultat</option>
+            <option value="admin-result-create-confirm">Admin — confirmation création</option>
+            <option value="admin-result-detail">Admin — fiche résultat</option>
+            <option value="admin-result-edit">Admin — modification résultat</option>
+            <option value="admin-result-edit-confirm">Admin — confirmation modification</option>
+            <option value="admin-result-history">Admin — historique résultat</option>
+            <option value="admin-permissions">Admin — permissions</option>
+            <option value="utility">États utilitaires</option>
+          </select>
+        </label>
+
+        <label>
+          Langue
+          <select id="language-select">
+            <option value="fr">Français</option>
+            <option value="en">English</option>
+          </select>
+        </label>
+
+        <label>
+          Largeur
+          <select id="viewport-select">
+            <option value="fluid">Fluide</option>
+            <option value="desktop">1440 px</option>
+            <option value="tablet">834 px</option>
+            <option value="mobile">390 px</option>
+            <option value="small-mobile">320 px</option>
+          </select>
+        </label>
+
+        <label>
+          État
+          <select id="state-select">
+            <option value="default">Normal</option>
+            <option value="empty">Vide</option>
+            <option value="missing">Traduction absente</option>
+            <option value="error">Erreur</option>
+            <option value="success">Succès</option>
+          </select>
+        </label>
+
+        <label class="annotation-toggle">
+          <input id="annotation-toggle" type="checkbox" />
+          Annotations accessibilité
+        </label>
+      </div>
+    </section>
+
+    <p id="prototype-status" class="sr-only" aria-live="polite"></p>
+
+    <div class="prototype-stage">
+      <div id="prototype-frame" class="prototype-frame viewport-fluid">
+        <div id="prototype-root"></div>
+      </div>
+    </div>
+
+    <dialog id="media-dialog" class="media-dialog" aria-labelledby="dialog-title">
+      <div class="dialog-visual" aria-hidden="true">
+        <span>Emplacement média autorisé</span>
+      </div>
+      <h2 id="dialog-title" data-dialog-title>Aperçu média fictif</h2>
+      <p data-dialog-copy>
+        Cette forme remplace une photographie. Aucun portrait ou contenu social
+        n’est utilisé.
+      </p>
+      <button
+        class="button button-primary"
+        type="button"
+        data-close-dialog
+        data-dialog-close
+      >
+        Fermer
+      </button>
+    </dialog>
+  </body>
+</html>

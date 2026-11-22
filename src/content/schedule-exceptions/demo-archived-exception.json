@@ -1,0 +1,12 @@
+{
+  "id": "demo-archived-exception",
+  "scheduleId": "demo-archived-course",
+  "date": "2025-02-19",
+  "kind": "cancelled",
+  "message": {
+    "fr": "Exemple fictif d’annulation ponctuelle.",
+    "en": "Fictional one-off cancellation example."
+  },
+  "status": "archived",
+  "demo": true
+}

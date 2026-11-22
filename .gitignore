@@ -1,0 +1,22 @@
+# Dependencies and generated output
+node_modules/
+dist/
+.astro/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Test output
+coverage/
+playwright-report/
+test-results/
+
+# Editors and operating systems
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Local tooling
+*.log

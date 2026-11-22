@@ -1,0 +1,8 @@
+{
+  "generatedAt": "2026-11-22T22:29:55.892Z",
+  "scannedFiles": 197,
+  "secretFindings": [],
+  "nonDemoFixtures": [],
+  "adminAuthentication": "absent-by-design-local-prototype",
+  "productionReady": false
+}

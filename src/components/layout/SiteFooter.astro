@@ -1,0 +1,44 @@
+---
+import type { Language } from "../../config/site";
+import { SITE_NAME, SOCIAL_LINKS } from "../../config/site";
+import { route } from "../../i18n/routes";
+import { getUi } from "../../i18n/ui";
+
+interface Props {
+  lang: Language;
+}
+
+const { lang } = Astro.props;
+const t = getUi(lang);
+---
+
+<footer class="site-footer">
+  <div class="site-container footer-grid">
+    <div>
+      <strong>{SITE_NAME}</strong>
+      <p>
+        {
+          lang === "fr"
+            ? "Site en développement — aucune information sportive réelle n’est encore publiée."
+            : "Website under development — no real sporting information is published yet."
+        }
+      </p>
+    </div>
+    <div>
+      <h2>{lang === "fr" ? "Explorer" : "Explore"}</h2>
+      <a href={route(lang, "club")}>{t.club}</a>
+      <a href={route(lang, "schedules")}>{t.schedules}</a>
+      <a href={route(lang, "contact")}>{t.contact}</a>
+    </div>
+    <div>
+      <h2>{lang === "fr" ? "Réseaux officiels" : "Official channels"}</h2>
+      <a href={SOCIAL_LINKS.instagram} rel="me noopener">Instagram</a>
+      <a href={SOCIAL_LINKS.youtube} rel="me noopener">YouTube</a>
+    </div>
+    <div>
+      <h2>{lang === "fr" ? "Informations" : "Information"}</h2>
+      <a href={route(lang, "legal")}>{t.legal}</a>
+      <a href={route(lang, "privacy")}>{t.privacy}</a>
+    </div>
+  </div>
+</footer>

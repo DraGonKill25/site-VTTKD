@@ -1,0 +1,44 @@
+{
+  "id": "demo-result-003",
+  "competitionId": "demo-competition-technique",
+  "discipline": "poomsae",
+  "participantType": "team",
+  "athleteIds": [
+    "demo-athlete-b",
+    "demo-athlete-d",
+    "demo-athlete-e"
+  ],
+  "teamName": {
+    "fr": "Équipe Poomsae Démo",
+    "en": "Demo Poomsae Team"
+  },
+  "rank": 2,
+  "medal": "silver",
+  "status": "published",
+  "comment": {
+    "fr": "Une équipe compte pour une participation et une médaille.",
+    "en": "One team counts as one participation and one medal."
+  },
+  "sourceRef": "Référence fictive — aucun document réel",
+  "documents": [],
+  "details": {
+    "discipline": "poomsae",
+    "category": {
+      "fr": "Équipe synchronisée fictive",
+      "en": "Fictional synchronised team"
+    },
+    "poomsaeType": {
+      "fr": "Type fictif",
+      "en": "Fictional type"
+    }
+  },
+  "createdAt": "2026-09-28T17:30:00Z",
+  "createdBy": "Compte Démo Contribution",
+  "updatedAt": "2026-09-29T10:00:00Z",
+  "updatedBy": "Compte Démo Sport",
+  "changeSummary": {
+    "fr": "Création et publication fictives.",
+    "en": "Fictional creation and publication."
+  },
+  "demo": true
+}

@@ -1,0 +1,21 @@
+{
+  "id": "club",
+  "route": {
+    "fr": "club",
+    "en": "club"
+  },
+  "title": {
+    "fr": "Le club",
+    "en": "The club"
+  },
+  "lead": {
+    "fr": "Présentation générale à compléter avec les informations officielles du club.",
+    "en": "General presentation to be completed with official club information."
+  },
+  "body": {
+    "fr": "Les informations historiques, l’adresse et l’équipe d’encadrement seront publiées après validation par le club.",
+    "en": "History, address and coaching-team information will be published after club approval."
+  },
+  "status": "published",
+  "demo": true
+}

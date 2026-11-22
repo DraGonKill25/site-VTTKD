@@ -1,0 +1,36 @@
+{
+  "id": "demo-result-005-archived",
+  "competitionId": "demo-competition-winter",
+  "discipline": "poomsae",
+  "participantType": "individual",
+  "athleteIds": ["demo-athlete-b"],
+  "rank": 3,
+  "medal": "bronze",
+  "status": "archived",
+  "comment": {
+    "fr": "Résultat fictif archivé et exclu du palmarès public.",
+    "en": "Fictional archived result excluded from public honours."
+  },
+  "sourceRef": "Référence fictive archivée",
+  "documents": [],
+  "details": {
+    "discipline": "poomsae",
+    "category": {
+      "fr": "Individuel fictif",
+      "en": "Fictional individual"
+    },
+    "poomsaeType": {
+      "fr": "Type fictif",
+      "en": "Fictional type"
+    }
+  },
+  "createdAt": "2026-11-03T14:00:00Z",
+  "createdBy": "Compte Démo Sport",
+  "updatedAt": "2026-11-04T09:00:00Z",
+  "updatedBy": "Compte Démo Principal",
+  "changeSummary": {
+    "fr": "Archivage fictif.",
+    "en": "Fictional archive."
+  },
+  "demo": true
+}

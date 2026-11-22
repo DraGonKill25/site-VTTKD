@@ -1,0 +1,51 @@
+---
+import logo from "../../logo.jpg";
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex,nofollow,noarchive" />
+    <title>{title} | Administration locale VTTKD</title>
+  </head>
+  <body class="admin-body">
+    <a class="skip-link" href="#admin-content">Aller au contenu</a>
+    <header class="admin-header">
+      <div class="site-container admin-header-inner">
+        <a class="brand-link" href="/admin/">
+          <img src={logo.src} width="48" height="48" alt="" />
+          <span>
+            <strong>VTTKD · ADMINISTRATION</strong>
+            <small>ENVIRONNEMENT LOCAL DE DÉMONSTRATION</small>
+          </span>
+        </a>
+        <nav aria-label="Navigation d’administration">
+          <a href="/admin/">Tableau de bord</a>
+          <a href="/admin/results/">Résultats</a>
+          <a href="/admin/documents/">Documents</a>
+          <a href="/fr/">Voir le site</a>
+        </nav>
+      </div>
+    </header>
+    <div class="admin-warning">
+      <div class="site-container">
+        <strong>Prototype local :</strong> aucune authentification réelle et
+        aucune écriture dans le CMS. Les changements restent dans ce navigateur.
+      </div>
+    </div>
+    <main id="admin-content" class="admin-main" tabindex="-1">
+      <slot />
+    </main>
+  </body>
+</html>

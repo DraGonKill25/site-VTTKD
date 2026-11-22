@@ -1,0 +1,21 @@
+{
+  "id": "official-logo",
+  "kind": "photo",
+  "title": {
+    "fr": "Logo VAN THUYNE TAEKWONDO / ELITE",
+    "en": "VAN THUYNE TAEKWONDO / ELITE logo"
+  },
+  "description": {
+    "fr": "Ressource graphique fournie dans le projet. Une version vectorielle reste recommandée.",
+    "en": "Graphic asset supplied with the project. A vector version is still recommended."
+  },
+  "source": "/logo.jpg",
+  "alt": {
+    "fr": "Logo VAN THUYNE TAEKWONDO / ELITE",
+    "en": "VAN THUYNE TAEKWONDO / ELITE logo"
+  },
+  "credit": "Ressource fournie par le projet",
+  "rightsStatus": "approved",
+  "status": "published",
+  "demo": false
+}

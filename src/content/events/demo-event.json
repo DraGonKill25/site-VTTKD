@@ -1,0 +1,25 @@
+{
+  "id": "demo-event",
+  "route": {
+    "fr": "evenement-de-demonstration",
+    "en": "demonstration-event"
+  },
+  "title": {
+    "fr": "Événement de démonstration",
+    "en": "Demonstration event"
+  },
+  "description": {
+    "fr": "Événement fictif destiné à vérifier l’affichage du calendrier.",
+    "en": "Fictional event used to verify the calendar display."
+  },
+  "startDateTime": "2027-03-20T09:00:00+01:00",
+  "endDateTime": "2027-03-20T17:00:00+01:00",
+  "timeZone": "Europe/Paris",
+  "location": {
+    "fr": "Lieu fictif — exemple uniquement",
+    "en": "Fictional venue — example only"
+  },
+  "disciplines": ["kyorugi", "poomsae"],
+  "status": "published",
+  "demo": true
+}

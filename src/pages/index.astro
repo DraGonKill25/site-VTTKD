@@ -1,0 +1,20 @@
+---
+import { route } from "../i18n/routes";
+
+const destination = route("fr", "home");
+const canonical = new URL(destination, Astro.site ?? Astro.url.origin);
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="refresh" content={`0;url=${destination}`} />
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={canonical} />
+    <title>VAN THUYNE TAEKWONDO / ELITE</title>
+  </head>
+  <body>
+    <p><a href={destination}>Continuer en français</a></p>
+  </body>
+</html>
