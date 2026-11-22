@@ -6,10 +6,9 @@ import { expect, test } from "@playwright/test";
 const rawBase = process.env.POC_BASE_PATH ?? "/site-VTTKD/";
 const basePath =
   rawBase === "/" ? "/" : `/${rawBase.replace(/^\/+|\/+$/g, "")}/`;
-const siteUrl = (process.env.POC_SITE_URL ?? "https://example.invalid").replace(
-  /\/+$/,
-  "",
-);
+const siteOrigin = new URL(
+  process.env.POC_SITE_URL ?? "https://example.invalid",
+).origin;
 const pocPath = (path: string) => `${basePath}${path.replace(/^\/+/, "")}`;
 const evidenceRoot = join(
   process.cwd(),
@@ -74,7 +73,7 @@ test.describe("public POC", () => {
     );
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
       "href",
-      `${siteUrl}${pocPath("fr/")}`,
+      `${siteOrigin}${pocPath("fr/")}`,
     );
 
     await page.goto(pocPath("en/"));
