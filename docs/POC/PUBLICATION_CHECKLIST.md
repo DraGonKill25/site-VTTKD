@@ -51,7 +51,8 @@ protection : toute personne connaissant l'URL peut consulter le POC.
 
 ## Contrôle fonctionnel local
 
-- [ ] `npm ci` réussit dans un environnement propre.
+- [ ] `npm install --include=optional` réussit avec npm `11.6.2` dans un
+  environnement propre.
 - [ ] `npm run check` réussit sans erreur.
 - [ ] `npm test` réussit.
 - [ ] `npm run build` et `npm run test:site` réussissent.

@@ -74,7 +74,8 @@ horaires et contact aux quatre largeurs.
 `.github/workflows/poc-pages.yml` :
 
 - se déclenche uniquement manuellement avec `workflow_dispatch` ;
-- utilise Node.js 22.23.4 et `npm ci` ;
+- utilise Node.js 22.23.4, npm 11.6.2 et installe explicitement les dépendances
+  optionnelles Linux ;
 - exécute audit, tests, build POC et contrôles ;
 - dérive l'origine et le préfixe depuis le dépôt GitHub ;
 - charge exclusivement `dist/` comme artefact Pages ;

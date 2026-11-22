@@ -38,8 +38,11 @@ jobs:
           node-version: 22.23.4
           cache: npm
 
-      - name: Install locked dependencies
-        run: npm ci
+      - name: Align npm with the validated local environment
+        run: npm install --global npm@11.6.2
+
+      - name: Install dependencies including Linux optional bindings
+        run: npm install --include=optional
 
       - name: Audit dependencies
         run: npm audit --audit-level=high
